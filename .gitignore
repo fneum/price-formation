@@ -1,0 +1,13 @@
+*.log
+*.aux
+*.out
+*.bbl
+*.blg
+*.pdf
+*.ps
+*.dvi
+*.toc
+old/*
+
+*.docx*
+*.spl

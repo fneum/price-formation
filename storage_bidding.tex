@@ -1,0 +1,292 @@
+%%
+%% Copyright 2007, 2008, 2009 Elsevier Ltd
+%% Title should be 75 characters
+%
+%Decreasing market value of variable renewables a result to policy and not variability
+%% This file is part of the 'Elsarticle Bundle'.
+%% ---------------------------------------------
+%%
+%% It may be distributed under the conditions of the LaTeX Project Public
+%% License, either version 1.2 of this license or (at your option) any
+%% later version.  The latest version of this license is in
+%%    http://www.latex-project.org/lppl.txt
+%% and version 1.2 or later is part of all distributions of LaTeX
+%% version 1999/12/01 or later.
+%%
+%% The list of all files belonging to the 'Elsarticle Bundle' is
+%% given in the file `manifest.txt'.
+%%
+
+%% Template article for Elsevier's document class `elsarticle'
+%% with numbered style bibliographic references
+%% SP 2008/03/01
+
+%\documentclass[sort&compress,preprint,review,3p]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%\documentclass[final,3p,times]{elsarticle}
+\documentclass[final,5p,times,twocolumn]{elsarticle}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+
+%% For including figures, graphicx.sty has been loaded in
+%% elsarticle.cls. If you prefer to use the old commands
+%% please give \usepackage{epsfig}
+\graphicspath{{graphics/}}
+
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+\usepackage{float}
+
+\usepackage[normalem]{ulem}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{siunitx}
+
+\usepackage{url}
+\usepackage[colorlinks=true, citecolor=blue, linkcolor=blue, filecolor=blue,urlcolor=blue]{hyperref}
+
+\usepackage[gen]{eurosym}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers.
+%% \usepackage{lineno}
+%\usepackage{lineno}
+
+
+\newcommand{\specialcell}[2][c]{%
+  \begin{tabular}[#1]{@{}l@{}}#2\end{tabular}}
+
+%use this to add space between rows
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+
+
+\def\co{CO${}_2$}
+\def\el{${}_{\textrm{el}}$}
+\def\th{${}_{\textrm{th}}$}
+
+
+
+\newcommand{\ubar}[1]{\text{\b{$#1$}}}
+
+\def\l{\lambda}
+\def\K{\kappa}
+\def\m{\mu}
+\def\G{\Gamma}
+\def\d{\partial}
+\def\cL{\mathcal{L}}
+
+
+\newcommand*\rot{\rotatebox{90}}
+\newcommand*\OK{\ding{51}}
+
+
+
+\usepackage{tikz}
+
+
+\usepackage[europeanresistors,americaninductors]{circuitikz}
+\usepackage{adjustbox}
+
+% *** FLOAT PACKAGES ***
+%
+\usepackage{fixltx2e}
+% fixltx2e, the successor to the earlier fix2col.sty, was written by
+% Frank Mittelbach and David Carlisle. This package corrects a few problems
+% in the LaTeX2e kernel, the most notable of which is that in current
+% LaTeX2e releases, the ordering of single and double column floats is not
+% guaranteed to be preserved. Thus, an unpatched LaTeX2e can allow a
+% single column figure to be placed prior to an earlier double column
+% figure. The latest version and documentation can be found at:
+% http://www.ctan.org/tex-archive/macros/latex/base/
+
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor under-represents over-representation}
+
+
+\journal{}
+
+\begin{document}
+%\linenumbers
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+%% use the tnoteref command within \title for footnotes;
+%% use the tnotetext command for theassociated footnote;
+%% use the fnref command within \author or \address for footnotes;
+%% use the fntext command for theassociated footnote;
+%% use the corref command within \author for corresponding author footnotes;
+%% use the cortext command for theassociated footnote;
+%% use the ead command for the email address,
+%% and the form \ead[url] for the home page:
+%% \title{Title\tnoteref{label1}}
+%% \tnotetext[label1]{}
+%% \author{Name\corref{cor1}\fnref{label2}}
+%% \ead{email address}
+%% \ead[url]{home page}
+%% \fntext[label2]{}
+%% \cortext[cor1]{}
+%% \address{Address\fnref{label3}}
+%% \fntext[label3]{}
+
+
+%\title{Avoiding Cannibalization of Electricity Market Revenues for Wind and Solar at High Penetrations}
+\title{Storage bidding strategies from long-term equilibria}
+%recommendation from essica: read the peer review guidelines from Nature
+
+
+
+%% use optional labels to link authors explicitly to addresses:
+%% \author[label1,label2]{}
+%% \address[label1]{}
+%% \address[label2]{}
+
+\author[kit]{T.~Brown\corref{cor1}}
+\ead{tom.brown@kit.edu}
+
+
+
+\cortext[cor1]{Corresponding author}
+\address[kit]{Institute for Automation and Applied Informatics, Karlsruhe Institute of Technology, Hermann-von-Helmholtz-Platz 1, 76344 Eggenstein-Leopoldshafen, Germany}
+
+
+\begin{abstract}
+  In power system models that co-optimize asset capacity with
+  dispatch, it is often cost-effective to invest in storage when
+  shares of wind and solar are high. However, given a certain capacity
+  of storage, it is then unclear how this storage should bid in real
+  markets where only dispatch is optimized. In this note we provide
+  the answer by lifting storage constraints into the objective
+  function via the Lagrangian, thus showing that the shadow prices
+  from the original problem dictate the storage bids in the short-term
+  model.
+\end{abstract}
+
+
+\begin{keyword}
+%% keywords here, in the form: keyword \sep keyword
+%Here are some suggestions:
+ renewable energy policy \sep storage \sep large-scale integration of renewable power generation
+
+%% PACS codes here, in the form: \PACS code \sep code
+
+%% MSC codes here, in the form: \MSC code \sep code
+%% or \MSC[2008] code \sep code (2000 is the default)
+
+\end{keyword}
+
+\end{frontmatter}
+
+\section{Introduction}
+
+In power system models with generators and load-shedding but no
+storage, prices in long-term models that co-optimize capacity with
+dispatch are always the same as the prices in short-term models that
+only optimize dispatch. This is due to the fact that the value of lost
+load (VOLL) screens out the capital costs from the long-term model, so
+that only the VOLL and marginal costs of the generators appear in the
+long-term prices.
+
+This does NOT happen with storage in the model.
+
+It was shown in \cite{Brown2020} that in long-term models storage make
+back their costs exactly from the market prices (zero-profit rule).
+
+But how exactly are prices formed given that prices no longer
+correspond to marginal costs of generators? What do the storage units
+bid?
+
+And how does this work in short-term models? They must choose a bidding strategy so that their price arbitrage covers their investment costs.
+
+We show how this works in math.
+
+
+\section{Math}
+
+Lift constraints up into objective function.
+
+\subsection{Single node long-term equilibrium with storage}\label{sec:storage}
+
+
+Suppose we add storage units $r$ with discharging dispatch $g^{\textrm{dis}}_{r,t}$ and power capacity $G^{\textrm{dis}}_{r}$, storing power $g^{\textrm{sto}}_{r,t}$ and capacity $G^{\textrm{sto}}_{r}$, and state of charge $g^{\textrm{ene}}_{r,t}$ and energy capacity $G^{\textrm{ene}}_{r}$. The efficiency from hour to hour is $\eta^{\textrm{ene}}$ (for losses due to self-discharge), the storing efficiency is $\eta^{\textrm{sto}}$ and the dispatch efficiency is $\eta^{\textrm{dis}}$.
+
+We add to the objective function an additional cost term:
+\begin{equation*}
+  -\sum_{r,\circ} c^\circ_r G^\circ_r =  -\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r -\sum_r c^{\textrm{sto}}_r G^{\textrm{sto}}_r -\sum_r c^{\textrm{dis}}_r G^{\textrm{dis}}_r
+\end{equation*}
+where the symbol $\circ$ runs over $\{\textrm{ene},\textrm{sto},\textrm{dis}\}$. We assume no marginal costs for the dispatch.
+
+The demand balancing equation \eqref{eq:balance} is modified to:
+\begin{equation}
+   \sum_a d_{a,t} - \sum_s g_{s,t} - \sum_r g^{\textrm{dis}}_{r,t}  + \sum_r g^{\textrm{sto}}_{r,t}  =  0 \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t
+\end{equation}
+The standard capacity constraints apply:
+\begin{align}
+    -g^\circ_{r,t}\leq 0 \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^\circ_{r,t} \hspace{1cm} \forall r,t  \label{eq:storlower}\\
+    g^\circ_{r,t} - G^\circ_r \leq 0 \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^\circ_{r,t} \hspace{1cm} \forall r,t \label{eq:storupper}
+\end{align}
+In addition we have the constraint for the consistency of the state of charge between hours according to how much was dispatched or stored:
+\begin{equation}
+    g^{\textrm{ene}}_{r,t}- \eta^{\textrm{ene}}_r g^{\textrm{ene}}_{r,t-1} - \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t} + (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t}  =  0 \hspace{0.14cm}\perp \hspace{0.14cm} \l^{\textrm{ene}}_{r,t} \hspace{0.14cm} \forall r,t  \label{eq:storsoc}
+\end{equation}
+We assume that the state of charge is cyclic $g^{\textrm{ene}}_{r,-1} = g^{\textrm{ene}}_{r,T-1}$.
+
+From KKT stationarity we get:
+\begin{align}
+\frac{\d \cL}{\d G^\circ_{r}} = 0 &\Rightarrow - c^\circ_r + \sum_t \bar{\m}^\circ_{r,t}  = 0 \\
+    \frac{\d \cL}{\d g^{\textrm{dis}}_{r,t}} = 0 &\Rightarrow  \l_t + \ubar{\m}^{\textrm{dis}}_{r,t} - \bar{\m}^{\textrm{dis}}_{r,t} - (\eta^{\textrm{dis}}_r)^{-1} \l^{\textrm{ene}}_{r,t}  = 0 \\
+    \frac{\d \cL}{\d g^{\textrm{sto}}_{r,t}} = 0 &\Rightarrow  -\l_t + \ubar{\m}^{\textrm{sto}}_{r,t} - \bar{\m}^{\textrm{sto}}_{r,t} + \eta^{\textrm{sto}}_r \l^{\textrm{ene}}_{r,t}  = 0 \\
+    \frac{\d \cL}{\d g^{\textrm{ene}}_{r,t}} = 0 &\Rightarrow   \ubar{\m}^{\textrm{ene}}_{r,t} - \bar{\m}^{\textrm{ene}}_{r,t} -  \l^{\textrm{ene}}_{r,t} + \eta^{\textrm{ene}}_r \l^{\textrm{ene}}_{r,t+1}   = 0
+\end{align}
+
+The zero-profit rule for storage proceeds the usual way:
+\begin{align}
+  \sum_\circ c^\circ_r G^\circ_r & =  \sum_{\circ,t} G^\circ_r\bar{\m}^\circ_{r,t}  =   \sum_{\circ,t} g^\circ_{r,t}\bar{\m}^\circ_{r,t} \nonumber \\
+   = & \sum_t \left[ \l_t g^{\textrm{dis}}_{r,t} -(\eta^{\textrm{dis}}_r)^{-1} \l^{\textrm{ene}}_{r,t}  g^{\textrm{dis}}_{r,t}
+  -\l_t g^{\textrm{sto}}_{r,t} + \eta^{\textrm{sto}}_r \l^{\textrm{ene}}_{r,t} g^{\textrm{sto}}_{r,t} \right.\nonumber \\
+  & \left. \hspace{.5cm}-\l^{\textrm{ene}}_{r,t}g^{\textrm{ene}}_{r,t} + \eta^{\textrm{ene}}_r \l^{\textrm{ene}}_{r,t+1}g^{\textrm{ene}}_{r,t} \right] \nonumber \\
+   = & \sum_t \l_t \left[ g^{\textrm{dis}}_{r,t} - g^{\textrm{sto}}_{r,t}  \right] \nonumber \\
+   & + \sum_t  \l^{\textrm{ene}}_{r,t} \left[ -(\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t}+ \eta^{\textrm{sto}}_r  g^{\textrm{sto}}_{r,t} -g^{\textrm{ene}}_{r,t} + \eta^{\textrm{ene}}_r g^{\textrm{ene}}_{r,t-1} \right] \nonumber \\
+      = & \sum_t \l_t \left[ g^{\textrm{dis}}_{r,t} - g^{\textrm{sto}}_{r,t}  \right]
+\end{align}
+The first equality is stationarity for $G^\circ_r$; the second is complimentarity for constraint \eqref{eq:storupper}; the third is stationarity for $g^\circ_{r,t}$ and complimentarity for constraint \eqref{eq:storlower}; the fouth rearranges terms and shifts the cyclic sum over $g^{\textrm{ene}}_{r,t}$; the final equality uses the state of charge constraint \eqref{eq:storsoc}.
+
+The final results shows that the storage recovers its capital costs by arbitrage, charging while prices $\l_t$ are low, and discharging while prices are high.
+
+The relation between market value and LCOE of generators in the system are not affected by the introduction of storage (although the optimal capacities may change).
+
+
+
+\bibliographystyle{elsarticle-num}
+
+\biboptions{sort&compress}
+\bibliography{storage_bidding}
+
+
+
+\end{document}
