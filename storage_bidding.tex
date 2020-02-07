@@ -34,7 +34,7 @@
 %% \documentclass[final,3p,times,twocolumn]{elsarticle}
 %% \documentclass[final,5p,times]{elsarticle}
 %\documentclass[final,3p,times]{elsarticle}
-\documentclass[final,5p,times,twocolumn]{elsarticle}
+\documentclass[final,3p,times]{elsarticle}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -178,13 +178,12 @@
 \begin{abstract}
   In power system models that co-optimize asset capacity with
   dispatch, it is often cost-effective to invest in storage when
-  shares of wind and solar are high. However, given a certain capacity
-  of storage, it is then unclear how this storage should bid in real
-  markets where only dispatch is optimized. In this note we provide
-  the answer by lifting storage constraints into the objective
-  function via the Lagrangian, thus showing that the shadow prices
-  from the original problem dictate the storage bids in the short-term
-  model.
+  shares of wind and solar are high. However, it is then unclear how
+  this storage should bid in real markets where only dispatch is
+  optimized. In this note we provide the answer by lifting storage
+  constraints from the long-term model into the objective function via
+  the Lagrangian, thus showing that the shadow prices from the
+  original problem dictate the storage charging and discharging bids in the short-term model.
 \end{abstract}
 
 
@@ -206,31 +205,132 @@
 
 In power system models with generators and load-shedding but no
 storage, prices in long-term models that co-optimize capacity with
-dispatch are always the same as the prices in short-term models that
-only optimize dispatch. This is due to the fact that the value of lost
-load (VOLL) screens out the capital costs from the long-term model, so
-that only the VOLL and marginal costs of the generators appear in the
-long-term prices.
+dispatch are always the same as the prices in short-term models where
+you freeze the asset capacities from the long-term model and only
+optimize dispatch. This is due to the fact that the value of lost load
+(VOLL) screens out the capital costs from the long-term model, so that
+only the VOLL and marginal costs of the generators appear in the
+long-term prices. This is proved in Section \ref{sec:generators}.
 
 This does NOT happen with storage in the model.
 
 It was shown in \cite{Brown2020} that in long-term models storage make
-back their costs exactly from the market prices (zero-profit rule).
+back their costs exactly from the market prices (zero-profit rule). The proof is reproduced in \ref{sec:storage}.
 
-But how exactly are prices formed given that prices no longer
-correspond to marginal costs of generators? What do the storage units
+But how exactly are prices formed given that not all prices
+correspond to marginal costs of generators anymore? What do the storage units
 bid?
 
 And how does this work in short-term models? They must choose a bidding strategy so that their price arbitrage covers their investment costs.
 
 We show how this works in math.
 
+TODO Surely already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps?
 
-\section{Math}
+NB: Conventional generators also use stored fuels (coal, gas, uranium, etc.), just we ignore storage constraints / combine them into delivery costs for fuel.
 
-Lift constraints up into objective function.
+\section{Warm up with generators only}\label{sec:generators}
 
-\subsection{Single node long-term equilibrium with storage}\label{sec:storage}
+We maximize yearly social welfare for a single node with linear supply cost and demand utility functions in a long-term equilibrium:
+\begin{equation}
+    \max_{d_{a,t}, g_{s,t}, G_s}\left[\sum_{a,t} u_{a,t} d_{a,t} -  \sum_s c_s G_s - \sum_{s,t} o_{s} g_{s,t}\right]  \label{eq:objl}
+\end{equation}
+subject to
+\begin{align}
+   \sum_a d_{a,t} - \sum_s g_{s,t} & =  0 \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t \label{eq:balance}\\
+    -d_{a,t} & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \ubar{\mu}_{a,t} \hspace{0.34cm} \forall a,t \\
+    d_{a,t} - D_{a,t} & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \bar{\mu}_{a,t} \hspace{0.34cm} \forall a,t \\
+    -g_{s,t} & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \ubar{\mu}_{s,t} \hspace{0.34cm} \forall s,t \\
+         g_{s,t} - \bar{g}_{s,t} G_s & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \bar{\mu}_{s,t} \hspace{0.34cm} \forall s,t
+\end{align}
+Here $t$ labels time periods representing a year of load and weather conditions, $a$ labels consumers, $s$ labels generators, $d_{a,t}$ is the
+demand dispatch, $D_{a,t}$ the demand volume bid (not optimized), $g_{s,t}$ is the generator dispatch, $G_s$ is the generator
+capacity and $\bar{g}_{s,t}\in[0,1]$ is the availability/capacity factor (which
+varies with time for variable renewable generators like wind and
+solar). $\l_t$ is the marginal price of electricity, while
+$\bar{\mu}_{s,t}$ and $\ubar{\mu}_{s,t}$ represent shadow prices of
+the generator constraints. $c_s$ represent fixed annual costs, while
+$o_s$ represent variable costs, and $u_{a,t}$ the marginal utility.
+
+If we simplify to the situation of only one demand for each time with
+a value of lost load greater than any generator marginal cost $u_{0,t}
+= V >> o_s \forall s$ and less than any generator capital cost $V <<
+c_s \forall s$, then in this model the prices are either one of $o_s$,
+depending on the generator $s$ setting the price (i.e. the generator
+running, but still with free capacity), or the value of lost load $V$
+if all generators are maxed out $g_{s,t} = G_s \forall s$.
+
+In this case the prices are identical to the prices in the short-term model with the frozen optimal capacities from the long-term model $G_{s}^*$:
+\begin{equation}
+    \max_{d_{t}, g_{s,t}}\left[\sum_{t} V d_{t}  - \sum_{s,t} o_{s} g_{s,t} \right]  \label{eq:objs}
+\end{equation}
+subject to
+\begin{align}
+   d_{t} - \sum_s g_{s,t} & =  0 \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t \label{eq:balance2}\\
+    -d_{t} & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \ubar{\mu}_{t} \hspace{0.34cm} \forall t  \nonumber \\
+    d_{t} - D_{t} & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \bar{\mu}_{t} \hspace{0.34cm} \forall t\nonumber  \\
+    -g_{s,t} & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \ubar{\mu}_{s,t} \hspace{0.34cm} \forall s,t \nonumber \\
+         g_{s,t} - \bar{g}_{s,t} G^*_s & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \bar{\mu}_{s,t} \hspace{0.34cm} \forall s,t \label{eq:generation}
+\end{align}
+
+Show easily via KKT.
+
+\section{Case of simple storage with infinite energy capacity}
+
+Consider first a simplified setup where we ignore the storage energy
+capacity, and just consider the power discharging and charging
+(power-to-gas-to-power with geological storage would be close to this
+picture).
+
+We add to the above model storage units $r$ with discharging dispatch $g^{\textrm{dis}}_{r,t}$ and power capacity $G^{\textrm{dis}}_{r}$, and storing power $g^{\textrm{sto}}_{r,t}$ and power capacity $G^{\textrm{sto}}_{r}$. The storing efficiency is $\eta_r^{\textrm{sto}}$ and the dispatch efficiency is $\eta_r^{\textrm{dis}}$.
+
+Now the optimization problem becomes (we assume no marginal costs for the storage):
+\begin{equation}
+    \max_{d_{t}, g_{s,t}, G_s,g^{\textrm{dis}}_{r,t},G^{\textrm{dis}}_{r},g^{\textrm{sto}}_{r,t},G^{\textrm{sto}}_{r}}\left[\sum_{t} Vd_{t} -  \sum_s c_s G_s - \sum_{s,t} o_{s} g_{s,t} -\sum_r c^{\textrm{sto}}_r G^{\textrm{sto}}_r -\sum_r c^{\textrm{dis}}_r G^{\textrm{dis}}_r\right]  \label{eq:objsr}
+\end{equation}
+The demand balance constraint \eqref{eq:balance2} is modified to:
+\begin{align}
+   d_{t} - \sum_s g_{s,t} - \sum_r g^{\textrm{dis}}_{r,t} + \sum_r g^{\textrm{sto}}_{r,t}  =  0 \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t \label{eq:balance3}
+\end{align}
+i.e. charging $g^{\textrm{sto}}_{r,t}$ behaves like a demand, while discharging $g^{\textrm{dis}}_{r,t}$ behaves like a generator.
+
+To the generation and demand constraints \eqref{eq:generation} we add the constraints for the storage power capacities:
+\begin{align}
+    -g^\circ_{r,t}\leq 0 \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^\circ_{r,t} \hspace{1cm} \forall r,t  \label{eq:storlower2}\\
+    g^\circ_{r,t} - G^\circ_r \leq 0 \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^\circ_{r,t} \hspace{1cm} \forall r,t \label{eq:storupper2}
+\end{align}
+where the symbol $\circ$ runs over $\{\textrm{sto},\textrm{dis}\}$.
+
+We must also enforce the constraints that whatever goes into the storage must also come out over the optimization period:
+\begin{equation}
+ (\eta_r^{\textrm{dis}})^{-1} \sum_t g^{\textrm{dis}}_{r,t} - \eta_r^{\textrm{sto}}  \sum_t g^{\textrm{sto}}_{r,t}  = 0  \hspace{1cm}\perp \hspace{1cm} \lambda_{r} \hspace{1cm} \forall r \label{eq:storconstraint}
+\end{equation}
+
+This problem is equivalent to the same problem where we take the optimal shadow prices $\lambda^*_r$, freeze them, take the constraint \eqref{eq:storconstraint} up into the objective function and remove the constraint \eqref{eq:storconstraint} from the problem. The new objective function is then:
+\begin{equation}
+    \max_{d_{t}, g_{s,t}, G_s,g^{\textrm{dis}}_{r,t},G^{\textrm{dis}}_{r},g^{\textrm{sto}}_{r,t},G^{\textrm{sto}}_{r}}\left[\sum_{t} Vd_{t} -  \sum_s c_s G_s - \sum_{s,t} o_{s} g_{s,t} -\sum_r c^{\textrm{sto}}_r G^{\textrm{sto}}_r -\sum_r c^{\textrm{dis}}_r G^{\textrm{dis}}_r -\sum_r \lambda^*_r\left[ (\eta_r^{\textrm{dis}})^{-1} \sum_t g^{\textrm{dis}}_{r,t} - \eta_r^{\textrm{sto}}  \sum_t g^{\textrm{sto}}_{r,t}\right]  \right]  \label{eq:objst}
+\end{equation}
+We retain the balance constraint \eqref{eq:balance3}, generation and demand capacity constraints \eqref{eq:generation} and the storage capacity constraints \eqref{eq:storlower2} and \eqref{eq:storupper2}.
+
+The equivalence between the problem with the constraint \eqref{eq:storconstraint} and the problem with the constraint lifted into the objective function is a standard Lagrangian move, which can be checked from the  KKT conditions for each problem.
+
+Now the interpretation of the new objective function: The dispatching storage is behaving exactly like a generator with marginal cost $ (\eta_r^{\textrm{dis}})^{-1} \lambda^*_r $ and capacity $G^{\textrm{dis}}_{r}$, while the charging storage is like a demand with marginal utility $ \eta_r^{\textrm{sto}} \lambda^*_r$  and bid volume $G^{\textrm{sto}}_{r}$.
+
+The price formation will be just like a regular market, and equivalent to the short-term optimisation with frozen capacities $G^*_s,G^{\textrm{sto},*}_{r},G^{\textrm{dis},*}_{r}$ from the long-term model. The objective function for the short-term problem, rearranged to group demand and supply bids, is:
+\begin{equation}
+    \max_{d_{t},g^{\textrm{sto}}_{r,t}, g_{s,t}, g^{\textrm{dis}}_{r,t}}\left[\sum_{t} Vd_{t} +  \sum_{r,t} \eta_r^{\textrm{sto}}\lambda^*_r g^{\textrm{sto}}_{r,t}   - \sum_{s,t} o_{s} g_{s,t}-\sum_{r,t} (\eta_r^{\textrm{dis}})^{-1}  \lambda^*_r g^{\textrm{dis}}_{r,t} \right]  \label{eq:objst2}
+\end{equation}
+Since $\eta_r^\circ \leq 1$, the charge bid is seen to be less than the discharge bid (buy low, sell high). If $\eta_r^\circ = 1$ then the bids are the same. This doesn't mean that there is no arbitrage, since the electricity prices $\l_t$ are determined only indirectly by the demand and supply bids.
+
+
+
+
+
+
+\appendix
+
+
+\section{Zero profit rule for long-term equilibrium with storage}\label{sec:storage}
 
 
 Suppose we add storage units $r$ with discharging dispatch $g^{\textrm{dis}}_{r,t}$ and power capacity $G^{\textrm{dis}}_{r}$, storing power $g^{\textrm{sto}}_{r,t}$ and capacity $G^{\textrm{sto}}_{r}$, and state of charge $g^{\textrm{ene}}_{r,t}$ and energy capacity $G^{\textrm{ene}}_{r}$. The efficiency from hour to hour is $\eta^{\textrm{ene}}$ (for losses due to self-discharge), the storing efficiency is $\eta^{\textrm{sto}}$ and the dispatch efficiency is $\eta^{\textrm{dis}}$.
@@ -241,7 +341,7 @@ We add to the objective function an additional cost term:
 \end{equation*}
 where the symbol $\circ$ runs over $\{\textrm{ene},\textrm{sto},\textrm{dis}\}$. We assume no marginal costs for the dispatch.
 
-The demand balancing equation \eqref{eq:balance} is modified to:
+The demand balancing equation is modified to:
 \begin{equation}
    \sum_a d_{a,t} - \sum_s g_{s,t} - \sum_r g^{\textrm{dis}}_{r,t}  + \sum_r g^{\textrm{sto}}_{r,t}  =  0 \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t
 \end{equation}
