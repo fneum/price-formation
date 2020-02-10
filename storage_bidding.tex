@@ -155,10 +155,8 @@
 %% \fntext[label3]{}
 
 
-%\title{Avoiding Cannibalization of Electricity Market Revenues for Wind and Solar at High Penetrations}
-\title{Storage bidding strategies from long-term equilibria}
-%recommendation from essica: read the peer review guidelines from Nature
 
+\title{Storage bidding strategies from long-term equilibria}
 
 
 %% use optional labels to link authors explicitly to addresses:
@@ -176,14 +174,16 @@
 
 
 \begin{abstract}
-  In power system models that co-optimize asset capacity with
+  In long-term power system models that co-optimize asset capacity with
   dispatch, it is often cost-effective to invest in storage when
-  shares of wind and solar are high. However, it is then unclear how
+  shares of wind and solar are high. However, it is unclear how
   this storage should bid in real markets where only dispatch is
-  optimized. In this note we provide the answer by lifting storage
+  optimized. It is also unclear how prices form in the long-term model.
+  In this note we provide the answer by lifting storage
   constraints from the long-term model into the objective function via
-  the Lagrangian, thus showing that the shadow prices from the
-  original problem dictate the storage charging and discharging bids in the short-term model.
+  the Lagrangian to create ``effective bids''.
+  The shadow prices from constraints in the
+  original long-term problem dictate the storage charging and discharging bids in the short-term model, and reveal how prices form in the long-term model.
 \end{abstract}
 
 
@@ -223,13 +223,13 @@ bid?
 
 And how does this work in short-term models? They must choose a bidding strategy so that their price arbitrage covers their investment costs.
 
-We show how this works in math.
+We show how this works in math, using effective bids introduced in \cite{Brown2020} (recapped in Section \ref{sec:effective}). Effective bids are constraints lifted up into the objective function using Lagrangian equivalence, and hence shown to corespond to effective bids that affect the price formation in the model.
 
-TODO Surely already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps?
+TODO Surely this is already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps?
 
 NB: Conventional generators also use stored fuels (coal, gas, uranium, etc.), just we ignore storage constraints / combine them into delivery costs for fuel.
 
-\section{Warm up with generators only}\label{sec:generators}
+\section{Warm-up: Price formation with generators only}\label{sec:generators}
 
 We maximize yearly social welfare for a single node with linear supply cost and demand utility functions in a long-term equilibrium:
 \begin{equation}
@@ -260,7 +260,7 @@ depending on the generator $s$ setting the price (i.e. the generator
 running, but still with free capacity), or the value of lost load $V$
 if all generators are maxed out $g_{s,t} = G_s \forall s$.
 
-In this case the prices are identical to the prices in the short-term model with the frozen optimal capacities from the long-term model $G_{s}^*$:
+In this case the long-term prices are identical to the prices in the short-term model with the frozen optimal capacities from the long-term model $G_{s}^*$:
 \begin{equation}
     \max_{d_{t}, g_{s,t}}\left[\sum_{t} V d_{t}  - \sum_{s,t} o_{s} g_{s,t} \right]  \label{eq:objs}
 \end{equation}
@@ -273,9 +273,46 @@ subject to
          g_{s,t} - \bar{g}_{s,t} G^*_s & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \bar{\mu}_{s,t} \hspace{0.34cm} \forall s,t \label{eq:generation}
 \end{align}
 
-Show easily via KKT.
+Proof: Suppose at time $t$ that $s$ is the price-setting generator (or demand, if all generators are maxed out). By definition, generator $s$ is both running, and has free capacity, so in both the long- and short-term models we have $\ubar{\mu}_{s,t} = \bar{\mu}_{s,t} = 0$.
 
-\section{Case of simple storage with infinite energy capacity}
+From KKT stationarity of the Lagrangian we have:
+\begin{align}
+\frac{\d \cL}{\d g_{s,t}} =  -o_s + \l_t + \ubar{\mu}_{s,t} - \bar{\mu}_{s,t}  =  -o_s + \l_t = 0
+\end{align}
+So $\l_t = o_s$.
+
+The only complication is if $c_s < V$ (excluded above), in which case
+it is cheaper in the long-term model to build new capacity than to
+shed load; in this case the capital costs $c_s$ will appear in the
+prices $\l_t$.
+
+
+\section{Effective bids from constraints on generation}\label{sec:effective}
+
+
+If we constrain the generation in the model, e.g. with a CO$_2$ budget, then this is equivalent to removing the constraint and altering the bidding strategy with the equivalent CO$_2$ price. This is economics 101, but the mechanism is useful for later considerations.
+
+Consider the CO$_2$ constraint:
+\begin{equation}
+  \sum_{s,t} e_s g_{s,t} \leq K \hspace{0.34cm}\perp \hspace{0.34cm} \mu_{\textrm{CO}_2} \label{eq:co2}
+\end{equation}
+where $e_s$ is the emission factor in tonne-CO$_2$ per MWh\el{} for
+generator $s$ and $K$ is a cap on yearly emissions in tonne-CO$_2$ per
+year.
+
+Using Lagrangian equivalence we can take the optimal value $\mu^*_{\textrm{CO}_2}$ from the problem and lift the constraint into the objective function:
+\begin{equation}
+  \cdots -\sum_{s,t} o_s g_{s,t}   - \mu^*_{\textrm{CO}_2} \left(\sum_{s,t} e_s g_{s,t} - K \right) \cdots
+\end{equation}
+
+
+The same problem solution can thus be obtained by replacing the CO$_2$ constraint with a direct cost of CO$_2$ and making the substitution $o_s \to o_s + e_s \mu^*_{\textrm{CO}_2}$. This is the ``effective'' bid. This was formally proved using KKT in \cite{Brown2020}.
+
+The price formation mechanism is then the same as in Section \ref{sec:generators}, except when CO$_2$-emitting generators are price-setting, we have $\l_t = o_s + e_s \mu^*_{\textrm{CO}_2}$.
+
+
+
+\section{Case of simple storage with infinite energy capacity}\label{sec:simple}
 
 Consider first a simplified setup where we ignore the storage energy
 capacity, and just consider the power discharging and charging
@@ -322,9 +359,39 @@ The price formation will be just like a regular market, and equivalent to the sh
 \end{equation}
 Since $\eta_r^\circ \leq 1$, the charge bid is seen to be less than the discharge bid (buy low, sell high). If $\eta_r^\circ = 1$ then the bids are the same. This doesn't mean that there is no arbitrage, since the electricity prices $\l_t$ are determined only indirectly by the demand and supply bids.
 
+\section{Full storage model}
+
+Now consider the case where the storage energy capacity $G^{\textrm{ene}}_r$ is also co-optimized, adding to the objective function of the long-term model  $-\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r$. The variable for the state of charge is
+$g^{\textrm{ene}}_{r,t}$, and the original state of charge is given as $g^{\textrm{ene}}_{r,0}$. For the bidding strategy it is easier to use the summed expression rather than the difference equation:
+\begin{equation}
+  g^{\textrm{ene}}_{r,t} = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right)
+\end{equation}
+
+Add the optimization variable $G^{\textrm{ene}}_r$ to the problem for the storage energy capacity and add $-\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r$ to the objective function. Then replace the constraint \eqref{eq:storconstraint} with two extra constraints:
+\begin{align}
+  -g^{\textrm{ene}}_{r,0} - \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) \leq  0  \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:enelower} \\
+  g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) - G^{\textrm{ene}}_r \leq  0  \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:eneupper}
+\end{align}
 
 
+If we lift these constraints into the objective function, this alters the charging demand bid (coefficient of  $g^{\textrm{sto}}_{r,t}$) to:
+\begin{equation}
+   \eta^{\textrm{sto}}_r \sum_{t'=t}^T \left( \ubar{\mu}^{\textrm{ene}}_{r,t'} -\bar{\mu}^{\textrm{ene}}_{r,t'}  \right)
+\end{equation}
+This has a nice interpretation: If at some future point $t'$ the storage is empty, then $\ubar{\mu}^{\textrm{ene}}_{r,t'} \geq 0$  and the bid increases; but if at some time $t'$ the storage is full, then
+$\bar{\mu}^{\textrm{ene}}_{r,t'} \geq 0$ and bid decreases.
 
+Similarly for the discharging dispatch bid (coefficient of  $-g^{\textrm{dis}}_{r,t}$, note minus sign of $o_sg_{s,t}$ in objective function) to:
+\begin{equation}
+   (\eta^{\textrm{dis}}_r)^{-1} \sum_{t'=t}^T \left(\ubar{\mu}^{\textrm{ene}}_{r,t'} - \bar{\mu}^{\textrm{ene}}_{r,t'}  \right)
+\end{equation}
+If the storage is nearly empty, this increases the price of the dispatch bid; if it's full in future, it decreases the price.
+
+Interesting: like previous section, charging and discharging bids are same up to a constant.
+
+COMPLICATIONS: i) Constraint \eqref{eq:eneupper} also alters the effective capital cost of $G^{\textrm{ene}}_r$? No, this is just the regular stationarity for $G^{\textrm{ene}}_r$, $ c^{\textrm{ene}}_r = \sum_t \bar{\mu}^{\textrm{ene}}_{r,t}$.
+
+ii) Storage may bring down the demand bids into the region where in the long-term model it is cheaper to build additional generation capacity than to shed this load. Not sure. This could mix capital costs into the prices (which storage does anyway). Clarify!
 
 
 \appendix
@@ -380,7 +447,9 @@ The final results shows that the storage recovers its capital costs by arbitrage
 
 The relation between market value and LCOE of generators in the system are not affected by the introduction of storage (although the optimal capacities may change).
 
+\section{Welfare economics theorem can also be understood via Lagrangian equivalence}
 
+I.e. lifting demand balance constraint into objective, then decomposing into problems for each demand and generator.
 
 \bibliographystyle{elsarticle-num}
 
