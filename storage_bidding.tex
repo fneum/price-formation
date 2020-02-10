@@ -225,7 +225,7 @@ And how does this work in short-term models? They must choose a bidding strategy
 
 We show how this works in math, using effective bids introduced in \cite{Brown2020} (recapped in Section \ref{sec:effective}). Effective bids are constraints lifted up into the objective function using Lagrangian equivalence, and hence shown to corespond to effective bids that affect the price formation in the model.
 
-TODO Surely this is already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps?
+TODO Surely this is already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps? See e.g. \cite{horsley2016}.
 
 NB: Conventional generators also use stored fuels (coal, gas, uranium, etc.), just we ignore storage constraints / combine them into delivery costs for fuel.
 
@@ -255,7 +255,7 @@ $o_s$ represent variable costs, and $u_{a,t}$ the marginal utility.
 If we simplify to the situation of only one demand for each time with
 a value of lost load greater than any generator marginal cost $u_{0,t}
 = V >> o_s \forall s$ and less than any generator capital cost $V <<
-c_s \forall s$, then in this model the prices are either one of $o_s$,
+o_s + c_s \forall s$, then in this model the prices are either one of $o_s$,
 depending on the generator $s$ setting the price (i.e. the generator
 running, but still with free capacity), or the value of lost load $V$
 if all generators are maxed out $g_{s,t} = G_s \forall s$.
@@ -281,10 +281,21 @@ From KKT stationarity of the Lagrangian we have:
 \end{align}
 So $\l_t = o_s$.
 
-The only complication is if $c_s < V$ (excluded above), in which case
-it is cheaper in the long-term model to build new capacity than to
-shed load; in this case the capital costs $c_s$ will appear in the
-prices $\l_t$.
+If $D_t > \sum_s G_{s}$, then $d_t = \sum_s g_{s,t} = \sum_s G_{s}$ and for the demand we have
+\begin{align}
+\frac{\d \cL}{\d d_{t}} =  V -\l_t + \ubar{\mu}_{t} - \bar{\mu}_{t}  =  V - \l_t = 0
+\end{align}
+so that $\l_t = V = o_s + \bar{\mu}_{s,t}$.
+
+The only complication is if $o_s + c_s < V$ for some $s$ (excluded
+above), in which case it is cheaper in the long-term model to build
+new capacity than to shed load; in this case the capital costs $c_s$
+will appear in the prices $\l_t$ for the long-term model. To be precise, at the hour $t$ of
+peak demand, $\bar{\mu}_{s,t} = c_s$ ($\bar{\mu}_{s,t'} =0$ for $t'
+\neq t$) and $\l_t = o_s + \bar{\mu}_{s,t} = o_s + c_s$. For the demand, $\bar{\mu}_{t} = V - \l_t = V - c_s - o_s$.
+
+
+
 
 
 \section{Effective bids from constraints on generation}\label{sec:effective}
@@ -338,7 +349,7 @@ To the generation and demand constraints \eqref{eq:generation} we add the constr
 \end{align}
 where the symbol $\circ$ runs over $\{\textrm{sto},\textrm{dis}\}$.
 
-We must also enforce the constraints that whatever goes into the storage must also come out over the optimization period:
+We must also enforce the constraints that whatever goes into the storage must also come out over the optimization period (i.e. state of charge cyclicity):
 \begin{equation}
  (\eta_r^{\textrm{dis}})^{-1} \sum_t g^{\textrm{dis}}_{r,t} - \eta_r^{\textrm{sto}}  \sum_t g^{\textrm{sto}}_{r,t}  = 0  \hspace{1cm}\perp \hspace{1cm} \lambda_{r} \hspace{1cm} \forall r \label{eq:storconstraint}
 \end{equation}
@@ -367,7 +378,13 @@ $g^{\textrm{ene}}_{r,t}$, and the original state of charge is given as $g^{\text
   g^{\textrm{ene}}_{r,t} = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right)
 \end{equation}
 
-Add the optimization variable $G^{\textrm{ene}}_r$ to the problem for the storage energy capacity and add $-\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r$ to the objective function. Then replace the constraint \eqref{eq:storconstraint} with two extra constraints:
+Add the optimization variable $G^{\textrm{ene}}_r$ to the problem for the storage energy capacity and add $-\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r$ to the objective function.
+The cyclicity constraint is the same as constraint \eqref{eq:storconstraint}
+\begin{equation}
+ g^{\textrm{ene}}_{r,0} = g^{\textrm{ene}}_{r,T} = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^T \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right)   \hspace{1cm}\perp \hspace{1cm} \lambda_{r} \hspace{1cm} \forall r
+\end{equation}
+
+For the energy capacity constraint  we add two extra constraints:
 \begin{align}
   -g^{\textrm{ene}}_{r,0} - \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) \leq  0  \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:enelower} \\
   g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) - G^{\textrm{ene}}_r \leq  0  \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:eneupper}
@@ -376,22 +393,22 @@ Add the optimization variable $G^{\textrm{ene}}_r$ to the problem for the storag
 
 If we lift these constraints into the objective function, this alters the charging demand bid (coefficient of  $g^{\textrm{sto}}_{r,t}$) to:
 \begin{equation}
-   \eta^{\textrm{sto}}_r \sum_{t'=t}^T \left( \ubar{\mu}^{\textrm{ene}}_{r,t'} -\bar{\mu}^{\textrm{ene}}_{r,t'}  \right)
+   \eta^{\textrm{sto}}_r \left[ \l_r + \sum_{t'=t}^T \left( \ubar{\mu}^{\textrm{ene}}_{r,t'} -\bar{\mu}^{\textrm{ene}}_{r,t'}  \right) \right]
 \end{equation}
 This has a nice interpretation: If at some future point $t'$ the storage is empty, then $\ubar{\mu}^{\textrm{ene}}_{r,t'} \geq 0$  and the bid increases; but if at some time $t'$ the storage is full, then
 $\bar{\mu}^{\textrm{ene}}_{r,t'} \geq 0$ and bid decreases.
 
 Similarly for the discharging dispatch bid (coefficient of  $-g^{\textrm{dis}}_{r,t}$, note minus sign of $o_sg_{s,t}$ in objective function) to:
 \begin{equation}
-   (\eta^{\textrm{dis}}_r)^{-1} \sum_{t'=t}^T \left(\ubar{\mu}^{\textrm{ene}}_{r,t'} - \bar{\mu}^{\textrm{ene}}_{r,t'}  \right)
+   (\eta^{\textrm{dis}}_r)^{-1}\left[ \l_r + \sum_{t'=t}^T \left(\ubar{\mu}^{\textrm{ene}}_{r,t'} - \bar{\mu}^{\textrm{ene}}_{r,t'}  \right)\right]
 \end{equation}
 If the storage is nearly empty, this increases the price of the dispatch bid; if it's full in future, it decreases the price.
 
 Interesting: like previous section, charging and discharging bids are same up to a constant.
 
-COMPLICATIONS: i) Constraint \eqref{eq:eneupper} also alters the effective capital cost of $G^{\textrm{ene}}_r$? No, this is just the regular stationarity for $G^{\textrm{ene}}_r$, $ c^{\textrm{ene}}_r = \sum_t \bar{\mu}^{\textrm{ene}}_{r,t}$.
+Does constraint \eqref{eq:eneupper} also alters the effective capital cost of $G^{\textrm{ene}}_r$? No, this is just the regular stationarity for $G^{\textrm{ene}}_r$, $ c^{\textrm{ene}}_r = \sum_t \bar{\mu}^{\textrm{ene}}_{r,t}$.
 
-ii) Storage may bring down the demand bids into the region where in the long-term model it is cheaper to build additional generation capacity than to shed this load. Not sure. This could mix capital costs into the prices (which storage does anyway). Clarify!
+How does the capital cost of energy storage work its way into bid prices? Bids related to capital costs of energy storage by $\bar{\mu}^{\textrm{ene}}_{r,t}$. What about for charging and discharging power?
 
 
 \appendix
