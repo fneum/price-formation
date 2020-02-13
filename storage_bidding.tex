@@ -180,8 +180,8 @@
   this storage should bid in real markets where only dispatch is
   optimized. It is also unclear how prices form in the long-term model.
   In this note we provide the answer by lifting storage
-  constraints from the long-term model into the objective function via
-  the Lagrangian to create ``effective bids''.
+  constraints from the long-term model into the objective function using
+  Lagrangian relaxation to create ``effective bids''.
   The shadow prices from constraints in the
   original long-term problem dictate the storage charging and discharging bids in the short-term model, and reveal how prices form in the long-term model.
 \end{abstract}
@@ -223,13 +223,37 @@ bid?
 
 And how does this work in short-term models? They must choose a bidding strategy so that their price arbitrage covers their investment costs.
 
-We show how this works in math, using effective bids introduced in \cite{Brown2020} (recapped in Section \ref{sec:effective}). Effective bids are constraints lifted up into the objective function using Lagrangian equivalence, and hence shown to corespond to effective bids that affect the price formation in the model.
+We show how this works in math, using effective bids introduced in \cite{Brown2020} (recapped in Section \ref{sec:effective}). Effective bids are constraints lifted up into the objective function using Lagrangian relaxation, and hence shown to corespond to effective bids that affect the price formation in the model.
 
-TODO Surely this is already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps? See e.g. \cite{horsley2016}.
 
 NB: Conventional generators also use stored fuels (coal, gas, uranium, etc.), just we ignore storage constraints / combine them into delivery costs for fuel.
 
+\subsection{Literature review}
+
+Surely this is already done in long-term hydro planning context, e.g. opportunity cost for storage dams in Scandinavia and the Alps? Much of hydro literature is mostly concerned with optimising behaviour of single hydro plant (respecting reservoir constraints, inflow, spillage, etc.) against price forecasts, see e.g. \cite{Pereira1989,Rotting1992,Fosso1999}, rather than looking at price formation of the whole system. TODO: look at \cite{horsley2016}. \cite{Steeger2017} seems to be doing something with the Lagrange multipliers of reservoir constraints, but focuses on case with single price-maker hydro plant (we assume every agent is a price-taker).
+
+The Imperial College group around Richard Green and Iain Staffell looks at prices with storage in a few papers, but it's all doing experimental simulations, no analytics.
+
+\cite{Green2015} looks at changing price duration curves in long-term equilibria as storage is introduced, but doesn't do anything analytic. See also \href{https://spiral.imperial.ac.uk/handle/10044/1/51138}{Green's slides}.
+
+
+\cite{Staffell2016} looks at how unit commitment interfers with the merit order curve in the absence of storage, altering prices, but no analytics (shadow prices are not well-defined in MILPs anyway).
+
+\cite{Ward2018} develops an algorithm for storage bidding that doesn't use optimisation, but looks at clusters of high and low prices from historical price duration curves.
+
+TODO: Mine \cite{Ward2018} references, e.g. \url{https://doi.org/10.1016/j.energy.2011.05.041}, \url{https://doi.org/10.1016/j.apenergy.2015.09.006}
+
+\cite{Ward2019} looks model price variability and how this affects arbitrage earnings by storage.
+
+TODO: Strbac et al 2012: Strbac, G., M. Aunedi, D. Pudjianto, P. Djapic, et al. (2012). Strategic Assessment of the Role and Value of
+Energy Storage Systems in the UK Low Carbon Energy Future, Report for the Carbon Trust.
+
+
+
+
 \section{Warm-up: Price formation with generators only}\label{sec:generators}
+
+We recap this textbook stuff to prepare for the introduction of storage.
 
 We maximize yearly social welfare for a single node with linear supply cost and demand utility functions in a long-term equilibrium:
 \begin{equation}
@@ -273,7 +297,7 @@ subject to
          g_{s,t} - \bar{g}_{s,t} G^*_s & \leq 0 \hspace{0.34cm}\perp \hspace{0.34cm} \bar{\mu}_{s,t} \hspace{0.34cm} \forall s,t \label{eq:generation}
 \end{align}
 
-Proof: Suppose at time $t$ that $s$ is the price-setting generator (or demand, if all generators are maxed out). By definition, generator $s$ is both running, and has free capacity, so in both the long- and short-term models we have $\ubar{\mu}_{s,t} = \bar{\mu}_{s,t} = 0$.
+Proof: If $D_t < \sum_s G_{s}$, then $d_t = D_t$ since $V >> o_s$. Suppose at time $t$ that generator $s$ is the price-setting generator. By definition, generator $s$ is both running, and has free capacity, so in both the long- and short-term models we have $\ubar{\mu}_{s,t} = \bar{\mu}_{s,t} = 0$.
 
 From KKT stationarity of the Lagrangian we have:
 \begin{align}
@@ -285,7 +309,7 @@ If $D_t > \sum_s G_{s}$, then $d_t = \sum_s g_{s,t} = \sum_s G_{s}$ and for the 
 \begin{align}
 \frac{\d \cL}{\d d_{t}} =  V -\l_t + \ubar{\mu}_{t} - \bar{\mu}_{t}  =  V - \l_t = 0
 \end{align}
-so that $\l_t = V = o_s + \bar{\mu}_{s,t}$.
+so that $\l_t = V = o_s + \bar{\mu}_{s,t}$ for all $s$.
 
 The only complication is if $o_s + c_s < V$ for some $s$ (excluded
 above), in which case it is cheaper in the long-term model to build
@@ -327,7 +351,7 @@ The price formation mechanism is then the same as in Section \ref{sec:generators
 
 Consider first a simplified setup where we ignore the storage energy
 capacity, and just consider the power discharging and charging
-(power-to-gas-to-power with geological storage would be close to this
+(power-to-gas-to-power with underground cavern storage would be close to this
 picture).
 
 We add to the above model storage units $r$ with discharging dispatch $g^{\textrm{dis}}_{r,t}$ and power capacity $G^{\textrm{dis}}_{r}$, and storing power $g^{\textrm{sto}}_{r,t}$ and power capacity $G^{\textrm{sto}}_{r}$. The storing efficiency is $\eta_r^{\textrm{sto}}$ and the dispatch efficiency is $\eta_r^{\textrm{dis}}$.
@@ -368,12 +392,15 @@ The price formation will be just like a regular market, and equivalent to the sh
 \begin{equation}
     \max_{d_{t},g^{\textrm{sto}}_{r,t}, g_{s,t}, g^{\textrm{dis}}_{r,t}}\left[\sum_{t} Vd_{t} +  \sum_{r,t} \eta_r^{\textrm{sto}}\lambda^*_r g^{\textrm{sto}}_{r,t}   - \sum_{s,t} o_{s} g_{s,t}-\sum_{r,t} (\eta_r^{\textrm{dis}})^{-1}  \lambda^*_r g^{\textrm{dis}}_{r,t} \right]  \label{eq:objst2}
 \end{equation}
-Since $\eta_r^\circ \leq 1$, the charge bid is seen to be less than the discharge bid (buy low, sell high). If $\eta_r^\circ = 1$ then the bids are the same. This doesn't mean that there is no arbitrage, since the electricity prices $\l_t$ are determined only indirectly by the demand and supply bids.
+
+If $\eta_r^\circ = 1$ then the bids are the same. This doesn't mean that there is no arbitrage (buy low, sell high), since the electricity prices $\l_t$ are determined only indirectly by the demand and supply bids. If there is no cost to moving power from one hour to another hour, it makes sense to bid at the same price, since every participants bids at their marginal cost. The market decides whether there should be a price arbitrage benefit. This is exactly like transmission linking two nodes. If there is no congestion, prices equalise. If there is congestion, prices separate. Congestion would be equivalent to either the charging or discharging power capacity being saturated.
+
+If $\eta_r^\circ < 1$, then there is energy (and hence money) lost by conversion, so the discharge bid is seen to be higher than the charge bid to compensate.
 
 \section{Full storage model}
 
 Now consider the case where the storage energy capacity $G^{\textrm{ene}}_r$ is also co-optimized, adding to the objective function of the long-term model  $-\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r$. The variable for the state of charge is
-$g^{\textrm{ene}}_{r,t}$, and the original state of charge is given as $g^{\textrm{ene}}_{r,0}$. For the bidding strategy it is easier to use the summed expression rather than the difference equation:
+$g^{\textrm{ene}}_{r,t}$, and the original state of charge is given as $g^{\textrm{ene}}_{r,0}$. For the bidding strategy it is easier to use the summed expression rather than the difference equation (we assume no self-discharge here):
 \begin{equation}
   g^{\textrm{ene}}_{r,t} = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right)
 \end{equation}
@@ -384,10 +411,10 @@ The cyclicity constraint is the same as constraint \eqref{eq:storconstraint}
  g^{\textrm{ene}}_{r,0} = g^{\textrm{ene}}_{r,T} = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^T \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right)   \hspace{1cm}\perp \hspace{1cm} \lambda_{r} \hspace{1cm} \forall r
 \end{equation}
 
-For the energy capacity constraint  we add two extra constraints:
+For the energy capacity constraint  we add two extra constraints for each hour $t$:
 \begin{align}
-  -g^{\textrm{ene}}_{r,0} - \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) \leq  0  \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:enelower} \\
-  g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) - G^{\textrm{ene}}_r \leq  0  \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:eneupper}
+-g^{\textrm{ene}}_{r,t} =   -g^{\textrm{ene}}_{r,0} - \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) \leq  0  \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:enelower} \\
+ g^{\textrm{ene}}_{r,t} - G^{\textrm{ene}}_r = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^t \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right) - G^{\textrm{ene}}_r \leq  0  \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:eneupper}
 \end{align}
 
 
@@ -410,6 +437,16 @@ Does constraint \eqref{eq:eneupper} also alters the effective capital cost of $G
 
 How does the capital cost of energy storage work its way into bid prices? Bids related to capital costs of energy storage by $\bar{\mu}^{\textrm{ene}}_{r,t}$. What about for charging and discharging power?
 
+
+\section{Demonstration in real model}
+
+TODO
+
+Show concrete examples of what the shadow prices and bids look like.
+
+Start easy with renewables + gas + storage.
+
+Then work up to renewables + battery + P2G.
 
 \appendix
 
