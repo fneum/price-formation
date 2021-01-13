@@ -450,6 +450,74 @@ Start easy with renewables + gas + storage.
 
 Then work up to renewables + battery + P2G.
 
+
+\subsection{PyPSA implementation}
+
+In PyPSA the optimization is a system cost minimization:
+\begin{equation}
+    \min_{g_{s,t}, G_s,g^{\circ}_{r,t},G^{\circ}_{r}},\left[ \sum_s c_s G_s + \sum_{s,t} o_{s} g_{s,t} +\sum_{\circ}\sum_r c^{\circ}_r G^{\circ}_r\right]  \label{eq:objpypsa}
+\end{equation}
+where $\circ\in \{\textrm{dis},\textrm{sto},\textrm{ene}\}$ runs over
+the storage dispatch, charging and energy capacity.
+
+$g^{\textrm{dis}}_{r,t}$ is the dispatch of the PyPSA Link (p0) going from the storage bus to the electricity bus with efficiency $\eta^{\textrm{dis}}_r$. $g^{\textrm{dis}}_{r,t}$ leaves the storage bus, $\eta^{\textrm{dis}}_rg^{\textrm{dis}}_{r,t}$ arrives at the electricity bus.
+
+$g^{\textrm{sto}}_{r,t}$ is the dispatch of the PyPSA Link (p0) going from the electricity bus to the storage bus with efficiency $\eta^{\textrm{sto}}_r$.  $g^{\textrm{sto}}_{r,t}$ leaves the electricity bus, $\eta^{\textrm{sto}}_rg^{\textrm{sto}}_{r,t}$ arrives at the storage bus.
+
+$g^{\textrm{ene}}_{r,t}$ is the energy content of the PyPSA Store (e in PyPSA), and $g^{\textrm{sds}}_r$ is the dispatch of the PyPSA Store (p in PyPSA). $g^{\textrm{sds}}_r > 0$ when the Store feeds power into storage bus, $g^{\textrm{sds}}_r < 0$ when the Store absorbs power from the storage bus.
+
+There is a storage bus which enforces the consistency between the
+Store dispatch and the Links connecting the storage bus to the electricity bus:
+\begin{equation}
+  g^{\textrm{sds}}_{r,t} - g^{\textrm{dis}}_{r,t} + \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t} = 0  \hspace{1cm}\perp \hspace{1cm} \lambda^{\textrm{sds}}_{r,t} \hspace{1cm} \forall r,t \label{eq:biddingconstraint}
+\end{equation}
+$\lambda^{\textrm{sds}}_{r,t}$ is the storage bus's marginal price.
+
+For hydrogen storage, $g^{\textrm{sds}}_{r,t}$ is the dispatch of the H2 Store, $g^{\textrm{sto}}_{r,t}$ is the electrical power demand of the H2 Electrolysis and $g^{\textrm{dis}}_{r,t}$ is the hydrogen demand of the H2 Fuel Cell.
+
+There is a constraint for the energy state of charge of the Store:
+\begin{equation}
+  \eta^{\textrm{ene}}_r g^{\textrm{ene}}_{r,t-1} - g^{\textrm{ene}}_{r,t} - g^{\textrm{sds}}_{r,t} = 0  \hspace{1cm}\perp \hspace{1cm} \lambda^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t  \label{eq:soc3}
+\end{equation}
+This is called mu\_state\_of\_charge in the \href{https://github.com/PyPSA/PyPSA/blob/shadowprices/pypsa/linopf.py}{shadowprice branch}.
+
+Then there are also limits on the energy capacity:
+\begin{align}
+    -g^{\textrm{ene}}_{r,t}\leq 0 \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t  \label{eq:storlower3}\\
+    g^{\textrm{ene}}_{r,t} - G^{\textrm{ene}}_r \leq 0 \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:storupper3}
+\end{align}
+These are called mu\_upper\_e and mu\_lower\_e in the \href{https://github.com/PyPSA/PyPSA/blob/shadowprices/pypsa/linopf.py}{shadowprice branch}.
+
+
+The demand balance constraint \eqref{eq:balance3} is modified to (not the inclusion of the efficiency for storage dispatch):
+\begin{align}
+   \sum_s g_{s,t} + \sum_r \eta^{\textrm{dis}}_r g^{\textrm{dis}}_{r,t} - \sum_r g^{\textrm{sto}}_{r,t}  =  d_t \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t \label{eq:balance4}
+\end{align}
+i.e. charging $g^{\textrm{sto}}_{r,t}$ behaves like a demand, while discharging $\eta^{\textrm{dis}}_rg^{\textrm{dis}}_{r,t}$ behaves like a generator.
+
+From stationarity we get:
+\begin{align}
+\frac{\d \cL}{\d g^{\textrm{sds}}_{r,t}} = \lambda^{\textrm{ene}}_{r,t} - \lambda^{\textrm{sds}}_{r,t} = 0
+\end{align}
+i.e. $\lambda^{\textrm{ene}}_{r,t} = \lambda^{\textrm{sds}}_{r,t}$.
+
+We also have from stationarity:
+\begin{align}
+\frac{\d \cL}{\d g^{\textrm{ene}}_{r,t}} = \lambda^{\textrm{ene}}_{r,t} - \eta^{\textrm{ene}}_r\lambda^{\textrm{ene}}_{r,t+1} + \ubar{\mu}^{\textrm{ene}}_{r,t} -  \bar{\mu}^{\textrm{ene}}_{r,t} = 0
+\end{align}
+
+
+If we lift constraints \eqref{eq:biddingconstraint}, \eqref{eq:soc3}, \eqref{eq:storlower3} and \eqref{eq:storupper3} into the objective function we get:
+\begin{align}
+  \sum_{r,t} \left[ - \lambda^{\textrm{sds}}_{r,t} \left(  g^{\textrm{sds}}_{r,t} - g^{\textrm{dis}}_{r,t} + \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t}\right) - \lambda^{\textrm{ene}}_{r,t} \left(\eta^{\textrm{ene}}_r g^{\textrm{ene}}_{r,t-1} - g^{\textrm{ene}}_{r,t} - g^{\textrm{sds}}_{r,t}\right)  + g^{\textrm{ene}}_{r,t}\ubar{\mu}^{\textrm{ene}}_{r,t} -  \bar{\mu}^{\textrm{ene}}_{r,t}  \left(    g^{\textrm{ene}}_{r,t} - G^{\textrm{ene}}_r \right) \right] \\
+  =   \sum_{r,t} \left[  g^{\textrm{sds}}_{r,t} \left(\lambda^{\textrm{ene}}_{r,t} - \lambda^{\textrm{sds}}_{r,t} \right)  +g^{\textrm{dis}}_{r,t}\lambda^{\textrm{sds}}_{r,t}  -  g^{\textrm{sto}}_{r,t} \eta^{\textrm{sto}}_r \lambda^{\textrm{sds}}_{r,t} + g^{\textrm{ene}}_{r,t}\left(\lambda^{\textrm{ene}}_{r,t} -\eta^{\textrm{ene}}_r \lambda^{\textrm{ene}}_{r,t+1}  + \ubar{\mu}^{\textrm{ene}}_{r,t} -  \bar{\mu}^{\textrm{ene}}_{r,t} \right) + \bar{\mu}^{\textrm{ene}}_{r,t} G^{\textrm{ene}}_r \right] \\
+   =   \sum_{r,t} \left[ g^{\textrm{dis}}_{r,t}\lambda^{\textrm{sds}}_{r,t}  -  g^{\textrm{sto}}_{r,t} \eta^{\textrm{sto}}_r \lambda^{\textrm{sds}}_{r,t} + \bar{\mu}^{\textrm{ene}}_{r,t} G^{\textrm{ene}}_r \right]
+\end{align}
+The cancellations in the second line are due to the KKT stationarity first order constraints satisfied at the optimum.
+
+So if these constraints are frozen and lifted into the objective with the optimal shadow prices, the storage dispatch $g^{\textrm{dis}}_{r,t}$ bids as a generator with time-dependent marginal cost $\lambda^{\textrm{sds}}_{r,t} $ and the storage charging $g^{\textrm{sto}}_{r,t}$ bids as a demand with marginal price $\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$, or equivalently as a generator with negative cost $-\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$.
+
+
 \appendix
 
 
