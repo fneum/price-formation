@@ -250,6 +250,7 @@ Energy Storage Systems in the UK Low Carbon Energy Future, Report for the Carbon
 
 \cite{CRAMPES2019100746} does same KKT procedure as below for a price-taking storage, and gets similar rules for bid prices. However, they don't consider the long-term equilibrium and price formation in such models. They mention similar results from the hydroelectricity literature \cite{lederer1984overall} (just does optimization problem, no KKT). \cite{CRAMPES2019100746} provide screening-curve-like things for the storage max-hours, which are like 2-d slices through LCOS heatmaps in \cite{schmidtmelchior2019}.
 
+TODO: read \href{https://www.uio.no/studier/emner/sv/oekonomi/ECON4930/v11/undervisningsmateriale/Hydropower%20economics4.pdf}{Hydro economics}.
 
 
 
@@ -489,7 +490,7 @@ Then there are also limits on the energy capacity:
 These are called mu\_upper\_e and mu\_lower\_e in the \href{https://github.com/PyPSA/PyPSA/blob/shadowprices/pypsa/linopf.py}{shadowprice branch}.
 
 
-The demand balance constraint \eqref{eq:balance3} is modified to (not the inclusion of the efficiency for storage dispatch):
+The demand balance constraint \eqref{eq:balance3} is modified to (note the inclusion of the efficiency for storage dispatch):
 \begin{align}
    \sum_s g_{s,t} + \sum_r \eta^{\textrm{dis}}_r g^{\textrm{dis}}_{r,t} - \sum_r g^{\textrm{sto}}_{r,t}  =  d_t \hspace{0.34cm}\perp \hspace{0.34cm} \l_t \hspace{0.34cm} \forall t \label{eq:balance4}
 \end{align}
@@ -515,7 +516,11 @@ If we lift constraints \eqref{eq:biddingconstraint}, \eqref{eq:soc3}, \eqref{eq:
 \end{align}
 The cancellations in the second line are due to the KKT stationarity first order constraints satisfied at the optimum.
 
-So if these constraints are frozen and lifted into the objective with the optimal shadow prices, the storage dispatch $g^{\textrm{dis}}_{r,t}$ bids as a generator with time-dependent marginal cost $\lambda^{\textrm{sds}}_{r,t} $ and the storage charging $g^{\textrm{sto}}_{r,t}$ bids as a demand with marginal price $\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$, or equivalently as a generator with negative cost $-\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$.
+So if these constraints are frozen and lifted into the objective with the optimal shadow prices, the storage dispatch $g^{\textrm{dis}}_{r,t}$ bids as a generator in the electricity market with time-dependent marginal cost $\lambda^{\textrm{sds}}_{r,t}\eta^{\textrm{dis} -1}_r $ (the factor comes from the coefficient in the electricity market balance equation \eqref{eq:balance4}) and the storage charging $g^{\textrm{sto}}_{r,t}$ bids as a demand with marginal price $\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$, or equivalently as a generator with negative cost $-\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$.
+
+So imagine one unit of electricity is bought to charge at exactly the marginal price of $\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$. This creates $\eta^{\textrm{sto}}_r$ of storage energy. This is converted back to $\eta^{\textrm{sto}}_r\eta^{\textrm{dis}}_r$ units of electricity sold at marginal cost of $\lambda^{\textrm{sds}}_{r,t}\eta^{\textrm{dis}-1}_r $. The total revenue is then $\lambda^{\textrm{sds}}_{r,t} \eta^{\textrm{sto}}_r$, which exactly covers the costs of charging. If the prices are different from marginal costs, then storage makes a profit to cover capital costs.
+
+The generation cost $\lambda^{\textrm{sds}}_{r,t}\eta^{\textrm{dis} -1}_r $ is the opportunity cost of selling the limited energy during times of high electricity prices.
 
 
 \appendix
