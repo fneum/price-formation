@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "price-formation"
+title: "Price Formation with 100% VRE"
+repository: https://github.com/fneum/price-formation
+version: 0.0.1
+doi: "N/A"
+date-released: "N/A"
+license: MIT
+authors:
+  - family-names: Brown
+    given-names: Tom
+  - family-names: Neumann
+    given-names: Fabian
