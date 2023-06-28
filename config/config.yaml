@@ -1,12 +1,10 @@
-run: trial
-
 country: DE
 
 load: 100 # MW
 
 voll: false
-elastic: true
-inelastic: false
+elastic: false
+inelastic: true
 
 wind: true
 solar: true
@@ -32,7 +30,7 @@ snapshots:
   start: "2010-01-01"
   end: "2011-01-01"
   inclusive: left
-  freq: 1H
+  freq: 3H
 
 solver:
   name: gurobi
@@ -52,8 +50,10 @@ solver_options:
 
 
 colors:
-  wind : blue
+  wind: blue
+  wind curtailed: lightblue
   solar: yellow
+  solar curtailed: orange
   battery: grey
   battery storage: grey
   battery charger: grey
@@ -64,3 +64,14 @@ colors:
   hydrogen underground storage: magenta
   electricity: black
   load: black
+
+preferred_order:
+  - load
+  - hydrogen electrolyser
+  - battery charger
+  - wind
+  - solar
+  - hydrogen fuel cell
+  - battery discharger
+  - wind curtailed
+  - solar curtailed

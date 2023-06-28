@@ -1,10 +1,16 @@
 from shutil import move, unpack_archive
+import yaml
 
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 
 HTTP = HTTPRemoteProvider()
 
 configfile: "config/config.yaml"
+
+SCENARIO_FN = "config/scenarios.yaml"
+
+with open(SCENARIO_FN, "r") as f:
+    scenarios = yaml.safe_load(f)
 
 
 rule download_weather_data:
@@ -18,42 +24,45 @@ rule download_weather_data:
 
 rule download_technology_data:
     input:
-        HTTP.remote(
-            "raw.githubusercontent.com/PyPSA/technology-data/{}/outputs/costs_{}.csv".format(
-                config["technology_data"]["version"],
-                config["technology_data"]["year"],
-            ),
-            keep_local=True,
-            static=True,
-        ),
-    params:
-        version=config["technology_data"]["version"],
-        year=config["technology_data"]["year"]
+        scenarios=SCENARIO_FN,
     output:
-        "results/technology_data.csv",
-    run:
-        move(input[0], output[0])
+        tech_data="results/{run}/technology_data.csv",
+    script:
+        "scripts/download_tech_data.py"
 
 
 rule solve:
     input:
+        scenarios=SCENARIO_FN,
         onwind_cf="resources/reading/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
         solar_cf="resources/reading/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
-        tech_data="results/technology_data.csv",
+        tech_data="results/{run}/technology_data.csv",
     output:
-        network="results/network.nc",
-        energy_balance="results/summary/energy_balance.csv",
-        statistics="results/summary/statistics.csv",
+        network="results/{run}/network.nc",
+        energy_balance="results/{run}/summary/energy_balance.csv",
+        statistics="results/{run}/summary/statistics.csv",
     script:
         "scripts/solve.py"
 
 
 rule plot:
     input:
+        scenarios=SCENARIO_FN,
         matplotlibrc="matplotlibrc",
         **rules.solve.output
     output:
-        price_duration="results/graphics/price_duration.pdf",
-        mu_energy_balance="results/graphics/mu_energy_balance.pdf",
+        price_duration="results/{run}/graphics/price_duration.pdf",
+        mu_energy_balance="results/{run}/graphics/mu_energy_balance.pdf",
+        energy_balance="results/{run}/graphics/energy_balance.pdf",
     script:
         "scripts/plot.py"
+
+
+rule plot_all:
+    input:
+        expand(rules.plot.output[0], run=scenarios.keys())
+
+
+rule solve_all:
+    input:
+        expand(rules.solve.output[0], run=scenarios.keys())

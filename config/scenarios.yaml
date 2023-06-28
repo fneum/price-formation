@@ -1,0 +1,5 @@
+run-elastic:
+  elastic: true
+  inelastic: false
+run-inelastic:
+  inelastic: true

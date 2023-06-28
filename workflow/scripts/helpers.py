@@ -1,4 +1,12 @@
 from pathlib import Path
+from snakemake.utils import update_config
+import yaml
+
+def set_scenario_config(config, scenarios_fn, key):
+    with open(scenarios_fn, "r") as f:
+        scenarios = yaml.safe_load(f)
+    update_config(config, scenarios[key])
+
 
 def mock_snakemake(rulename, configfiles=[], **wildcards):
     """

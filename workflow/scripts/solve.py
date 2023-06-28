@@ -2,6 +2,8 @@ import pypsa
 import pandas as pd
 import xarray as xr
 
+from helpers import set_scenario_config
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -228,6 +230,12 @@ if __name__ == "__main__":
 
         snakemake = mock_snakemake("solve")
 
+    set_scenario_config(
+        snakemake.config,
+        snakemake.input.scenarios,
+        snakemake.wildcards.run,
+    )
+
     country = snakemake.config["country"]
     
     n = pypsa.Network()
@@ -243,7 +251,7 @@ if __name__ == "__main__":
     solar_cf = load_time_series(snakemake.input.solar_cf, country, n.snapshots)
     onwind_cf = load_time_series(snakemake.input.onwind_cf, country, n.snapshots)
 
-    n.add("Bus", "electricity")
+    n.add("Bus", "electricity", carrier="electricity")
 
     colors = snakemake.config["colors"]
     n.madd("Carrier", colors.keys(), color=colors.values())
