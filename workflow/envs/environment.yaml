@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: : 2017-2023 The PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: MIT
+
+name: price-formation
+channels:
+- conda-forge
+- bioconda
+- gurobi
+dependencies:
+- python==3.11
+- pip
+- pypsa==0.24
+- snakemake-minimal
+- pandas
+- numpy
+- xarray
+- netcdf4
+- matplotlib
+- country_converter
+- graphviz
+- ipython
+- gurobi
+- ipykernel

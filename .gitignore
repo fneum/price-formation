@@ -1,5 +1,3 @@
-notes
-
 *.log
 *.aux
 *.out
@@ -14,3 +12,14 @@ old/*
 *.docx*
 *.spl
 *.org
+
+__MACOSX
+__pycache__
+*__pycache__
+.snakemake
+.vscode
+
+researchdata.reading.ac.uk
+notes
+resources
+results
