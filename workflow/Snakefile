@@ -52,8 +52,11 @@ rule plot:
         **rules.solve.output
     output:
         price_duration="results/{run}/graphics/price_duration.pdf",
+        price_time_series="results/{run}/graphics/price_time_series.pdf",
         mu_energy_balance="results/{run}/graphics/mu_energy_balance.pdf",
         energy_balance="results/{run}/graphics/energy_balance.pdf",
+        hydrogen_bidding="results/{run}/graphics/hydrogen_bidding.pdf",
+        battery_bidding="results/{run}/graphics/battery_bidding.pdf",
     script:
         "scripts/plot.py"
 

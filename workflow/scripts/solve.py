@@ -268,6 +268,9 @@ if __name__ == "__main__":
     add_battery(n, snakemake.config, tech_data)
     add_hydrogen(n, snakemake.config, tech_data)
 
+    if snakemake.config["zero_cost_storage"]:
+        n.stores.loc[:, "capital_cost"] = 0
+
     solve_network(n, snakemake.config)
 
     n.meta = snakemake.config

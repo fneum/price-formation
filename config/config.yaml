@@ -15,6 +15,8 @@ battery: true
 elastic_intercept: 2000 # €/MWh
 voll_price: 2000 # €/MWh
 
+zero_cost_storage: false
+
 technology_data:
   year: 2030
   version: v0.6.0
@@ -30,7 +32,7 @@ snapshots:
   start: "2010-01-01"
   end: "2011-01-01"
   inclusive: left
-  freq: 3H
+  freq: 1H
 
 solver:
   name: gurobi
@@ -41,7 +43,7 @@ solver_options:
     threads: 4
     method: 2 # barrier
     crossover: 0
-    BarConvTol: 1.e-6
+    BarConvTol: 1.e-7
     Seed: 123
     AggFill: 0
     PreDual: 0
@@ -50,20 +52,20 @@ solver_options:
 
 
 colors:
-  wind: blue
-  wind curtailed: lightblue
-  solar: yellow
-  solar curtailed: orange
-  battery: grey
-  battery storage: grey
-  battery charger: grey
-  battery discharger: grey
-  hydrogen: cyan
-  hydrogen fuel cell: red
-  hydrogen electrolyser: cyan
-  hydrogen underground storage: magenta
-  electricity: black
-  load: black
+  wind: "#2b90d4"
+  wind curtailed: "#add4ef"
+  solar: "#d6b829"
+  solar curtailed: "#e8d786"
+  battery: "#758a85"
+  battery storage: "#758a85"
+  battery charger: "#758a85"
+  battery discharger: "#758a85"
+  hydrogen: "#ce317c"
+  hydrogen fuel cell: "#e16d26"
+  hydrogen electrolyser: "#ce317c"
+  hydrogen underground storage: "#9723dc"
+  electricity: "#7eae51"
+  load: "#7eae51"
 
 preferred_order:
   - load
