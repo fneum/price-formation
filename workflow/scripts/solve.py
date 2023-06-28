@@ -1,4 +1,5 @@
 import pypsa
+import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -14,7 +15,7 @@ def annuity(r, n):
         return r / (1 - 1 / (1 + r) ** n)
 
 
-def load_technology_data(fn, defaults):
+def load_technology_data(fn, defaults, years=1):
     df = pd.read_csv(fn, index_col=[0, 1])
 
     df.loc[df.unit.str.contains("/kW"), "value"] *= 1e3
@@ -22,7 +23,7 @@ def load_technology_data(fn, defaults):
 
     df = df.value.unstack()[defaults.keys()].fillna(defaults)
 
-    annuity_factor = df.apply(lambda x: annuity(x["discount rate"], x["lifetime"]), axis=1)
+    annuity_factor = df.apply(lambda x: annuity(x["discount rate"], x["lifetime"]) * years, axis=1)
 
     df["capital_cost"] = (annuity_factor + df["FOM"] / 100) * df["investment"]
 
@@ -228,7 +229,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("solve")
+        snakemake = mock_snakemake("solve", run='run-inelastic')
 
     set_scenario_config(
         snakemake.config,
@@ -244,8 +245,13 @@ if __name__ == "__main__":
 
     n.snapshot_weightings.loc[:, :] = float(snakemake.config["snapshots"]["freq"][:-1])
 
+    freq = snakemake.config["snapshots"]["freq"]
+    years = (n.snapshots[-1] - n.snapshots[0] + pd.Timedelta(freq)) / np.timedelta64(1,'Y')
+
     tech_data = load_technology_data(
-        snakemake.input.tech_data, snakemake.config["technology_data"]["fill_values"]
+        snakemake.input.tech_data,
+        snakemake.config["technology_data"]["fill_values"],
+        years,
     )
 
     solar_cf = load_time_series(snakemake.input.solar_cf, country, n.snapshots)
