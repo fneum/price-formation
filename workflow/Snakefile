@@ -62,6 +62,35 @@ rule plot:
         "scripts/plot.py"
 
 
+rule solve_operations:
+    input:
+        scenarios=SCENARIO_FN,
+        network="results/{run}/network.nc"
+    output:
+        network="results/{run}/networks_operations.nc",
+        energy_balance="results/{run}/summary/operations/energy_balance.csv",
+        statistics="results/{run}/summary/operations/statistics.csv",
+    script:
+        "scripts/solve_operations.py"
+
+
+rule plot_operations:
+    input:
+        scenarios=SCENARIO_FN,
+        matplotlibrc="matplotlibrc",
+        **rules.solve_operations.output
+    output:
+        price_duration="results/{run}/graphics/operations/price_duration.pdf",
+        price_time_series="results/{run}/graphics/operations/price_time_series.pdf",
+        mu_energy_balance="results/{run}/graphics/operations/mu_energy_balance.pdf",
+        energy_balance="results/{run}/graphics/operations/energy_balance.pdf",
+        hydrogen_bidding="results/{run}/graphics/operations/hydrogen_bidding.pdf",
+        battery_bidding="results/{run}/graphics/operations/battery_bidding.pdf",
+        **{sns: "results/{run}/graphics/operations/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+    script:
+        "scripts/plot.py"
+
+
 rule plot_all:
     input:
         expand(rules.plot.output[0], run=scenarios.keys())
@@ -70,3 +99,13 @@ rule plot_all:
 rule solve_all:
     input:
         expand(rules.solve.output[0], run=scenarios.keys())
+
+
+rule plot_operations_all:
+    input:
+        expand(rules.plot_operations.output[0], run=scenarios.keys())
+
+
+rule solve_operations_all:
+    input:
+        expand(rules.solve_operations.output[0], run=scenarios.keys())
