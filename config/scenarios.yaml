@@ -1,28 +1,38 @@
-run-elastic:
-  elastic: true
-  inelastic: false
-run-inelastic:
-  inelastic: true
-run-voll:
-  inelastic: false
-  voll: true
+# run-elastic:
+#   elastic: true
+#   inelastic: false
+# run-inelastic:
+#   inelastic: true
+# run-voll:
+#   inelastic: false
+#   voll: true
 zero-cost-storage:
   zero_cost_storage: true
   voll: true
   inelastic: false
-elastic-intercept-200000:
-  elastic: true
+  battery: false
+zero-cost-storage-elastic:
+  zero_cost_storage: true
   inelastic: false
-  elastic_intercept: 200000
-elastic-intercept-20000:
   elastic: true
-  inelastic: false
-  elastic_intercept: 20000
-elastic-intercept-2000:
-  elastic: true
-  inelastic: false
+  battery: false
   elastic_intercept: 2000
-elastic-intercept-200:
-  elastic: true
-  inelastic: false
-  elastic_intercept: 200
+# elastic-intercept-200000:
+#   elastic: true
+#   inelastic: false
+#   elastic_intercept: 200000
+# elastic-intercept-20000:
+#   elastic: true
+#   inelastic: false
+#   elastic_intercept: 20000
+# elastic-intercept-2000:
+#   elastic: true
+#   inelastic: false
+#   elastic_intercept: 2000
+# elastic-intercept-200:
+#   elastic: true
+#   inelastic: false
+#   elastic_intercept: 200
+# no-storage:
+#   hydrogen: false
+#   battery: false

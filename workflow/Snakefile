@@ -57,6 +57,7 @@ rule plot:
         energy_balance="results/{run}/graphics/energy_balance.pdf",
         hydrogen_bidding="results/{run}/graphics/hydrogen_bidding.pdf",
         battery_bidding="results/{run}/graphics/battery_bidding.pdf",
+        **{sns: "results/{run}/graphics/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]}
     script:
         "scripts/plot.py"
 

@@ -77,3 +77,11 @@ preferred_order:
   - battery discharger
   - wind curtailed
   - solar curtailed
+
+supply_demand_curve:
+  snapshots:
+    - 2010-07-01 00:00
+    - 2010-07-01 12:00
+    - 2010-03-01 16:00
+    - 2010-01-01 00:00
+  ylim_max: 2000
