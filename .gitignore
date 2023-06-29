@@ -7,6 +7,9 @@
 *.ps
 *.dvi
 *.toc
+*.fdb_latexmk
+*.synctex.gz
+*.fls
 old/*
 
 *.docx*

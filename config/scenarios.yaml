@@ -17,6 +17,10 @@ zero-cost-storage-elastic:
   elastic: true
   battery: false
   elastic_intercept: 2000
+zero-cost-storage-inelastic:
+  zero_cost_storage: true
+  inelastic: true
+  battery: false
 # elastic-intercept-200000:
 #   elastic: true
 #   inelastic: false
