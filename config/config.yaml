@@ -85,3 +85,27 @@ supply_demand_curve:
     - 2010-03-01 16:00
     - 2010-01-01 00:00
   ylim_max: 2000
+
+price_duration_curve:
+  scenarios:
+    elasticity-nobat:
+      - inelastic-nobat
+      - elastic-200-nobat
+      - elastic-2000-nobat
+      - elastic-20000-nobat
+    elasticity:
+      - inelastic
+      - elastic-200
+      - elastic-2000
+      - elastic-20000
+    elasticity-nobat-zero:
+      - inelastic-nobat-zero
+      - elastic-200-nobat-zero
+      - elastic-2000-nobat-zero
+      - elastic-20000-nobat-zero
+    elasticity-zero:
+      - inelastic
+      - elastic-200
+      - elastic-2000
+      - elastic-20000
+    

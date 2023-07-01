@@ -1,42 +1,79 @@
-# run-elastic:
-#   elastic: true
-#   inelastic: false
-# run-inelastic:
-#   inelastic: true
-# run-voll:
-#   inelastic: false
-#   voll: true
-zero-cost-storage:
-  zero_cost_storage: true
-  voll: true
-  inelastic: false
-  battery: false
-zero-cost-storage-elastic:
-  zero_cost_storage: true
-  inelastic: false
+inelastic:
+  inelastic: true
+elastic-20000:
   elastic: true
-  battery: false
+  inelastic: false
+  elastic_intercept: 20000
+elastic-2000:
+  elastic: true
+  inelastic: false
   elastic_intercept: 2000
-zero-cost-storage-inelastic:
+elastic-200:
+  elastic: true
+  inelastic: false
+  elastic_intercept: 200
+inelastic-nobat:
+  inelastic: true
+  battery: false
+elastic-20000-nobat:
+  elastic: true
+  inelastic: false
+  elastic_intercept: 20000
+  battery: false
+elastic-2000-nobat:
+  elastic: true
+  inelastic: false
+  elastic_intercept: 2000
+  battery: false
+elastic-200-nobat:
+  elastic: true
+  inelastic: false
+  elastic_intercept: 200
+  battery: false
+inelastic-zero:
+  zero_cost_storage: true
+  inelastic: true
+elastic-20000-zero:
+  zero_cost_storage: true
+  elastic: true
+  inelastic: false
+  elastic_intercept: 20000
+elastic-2000-zero:
+  zero_cost_storage: true
+  elastic: true
+  inelastic: false
+  elastic_intercept: 2000
+elastic-200-zero:
+  zero_cost_storage: true
+  elastic: true
+  inelastic: false
+  elastic_intercept: 200
+inelastic-nobat-zero:
   zero_cost_storage: true
   inelastic: true
   battery: false
-# elastic-intercept-200000:
-#   elastic: true
+elastic-20000-nobat-zero:
+  zero_cost_storage: true
+  elastic: true
+  inelastic: false
+  elastic_intercept: 20000
+  battery: false
+elastic-2000-nobat-zero:
+  zero_cost_storage: true
+  elastic: true
+  inelastic: false
+  elastic_intercept: 2000
+  battery: false
+elastic-200-nobat-zero:
+  zero_cost_storage: true
+  elastic: true
+  inelastic: false
+  elastic_intercept: 200
+  battery: false
+# elastic-70a-zero:
 #   inelastic: false
-#   elastic_intercept: 200000
-# elastic-intercept-20000:
+#   zero_cost_storage: true
 #   elastic: true
-#   inelastic: false
-#   elastic_intercept: 20000
-# elastic-intercept-2000:
-#   elastic: true
-#   inelastic: false
-#   elastic_intercept: 2000
-# elastic-intercept-200:
-#   elastic: true
-#   inelastic: false
-#   elastic_intercept: 200
-# no-storage:
-#   hydrogen: false
-#   battery: false
+#   snapshots:
+#     start: "1950-01-01"
+#     end: "2021-01-01"
