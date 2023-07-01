@@ -1,4 +1,5 @@
-\documentclass[final,3p,times]{elsarticle}
+\documentclass[final,3p]{elsarticle}
+
 
 \bibliographystyle{elsarticle-num}
 \biboptions{sort&compress}
@@ -84,7 +85,7 @@ value of lost load (VOLL) screens out the capital costs from the long-term
 model, so that only the VOLL and marginal costs of the generators appear in the
 long-term prices. This is proved in Section \ref{sec:generators}.
 
-This does NOT happen with storage in the model.
+This does NOT happen with storage in the model. \todo{it does!}
 
 It was shown in \cite{Brown2020} that in long-term models storage make back
 their costs exactly from the market prices (zero-profit rule). The proof is
@@ -101,7 +102,6 @@ We show how this works in math, using effective bids introduced in
 constraints lifted up into the objective function using Lagrangian relaxation,
 and hence shown to corespond to effective bids that affect the price formation
 in the model.
-
 
 NB: Conventional generators also use stored fuels (coal, gas, uranium, etc.),
 just we ignore storage constraints / combine them into delivery costs for fuel.
@@ -473,18 +473,12 @@ There is a constraint for the energy state of charge of the Store:
 \begin{equation}
   \eta^{\textrm{ene}}_r g^{\textrm{ene}}_{r,t-1} - g^{\textrm{ene}}_{r,t} - g^{\textrm{sds}}_{r,t} = 0  \hspace{1cm}\perp \hspace{1cm} \lambda^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t  \label{eq:soc3}
 \end{equation}
-This is called mu\_state\_of\_charge in the
-\href{https://github.com/PyPSA/PyPSA/blob/shadowprices/pypsa/linopf.py}{shadowprice
-branch}.
 
 Then there are also limits on the energy capacity:
 \begin{align}
   -g^{\textrm{ene}}_{r,t}\leq 0 \hspace{1cm}\perp \hspace{1cm} \ubar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t  \label{eq:storlower3} \\
   g^{\textrm{ene}}_{r,t} - G^{\textrm{ene}}_r \leq 0 \hspace{1cm}\perp \hspace{1cm} \bar{\mu}^{\textrm{ene}}_{r,t} \hspace{1cm} \forall r,t \label{eq:storupper3}
 \end{align}
-These are called mu\_upper\_e and mu\_lower\_e in the
-\href{https://github.com/PyPSA/PyPSA/blob/shadowprices/pypsa/linopf.py}{shadowprice
-branch}.
 
 
 The demand balance constraint \eqref{eq:balance3} is modified to (note the
