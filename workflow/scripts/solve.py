@@ -275,6 +275,8 @@ if __name__ == "__main__":
 
     n.meta = snakemake.config
 
+    n.meta["run"] = snakemake.wildcards.run
+
     n.export_to_netcdf(snakemake.output.network)
 
     energy_balance = n.statistics.energy_balance(aggregate_time=False, aggregate_bus=False).T

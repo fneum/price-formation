@@ -52,6 +52,7 @@ rule plot:
         **rules.solve.output
     output:
         price_duration="results/{run}/graphics/price_duration.pdf",
+        price_duration_attributed="results/{run}/graphics/price_duration_attributed.pdf",
         price_time_series="results/{run}/graphics/price_time_series.pdf",
         mu_energy_balance="results/{run}/graphics/mu_energy_balance.pdf",
         energy_balance="results/{run}/graphics/energy_balance.pdf",
@@ -81,6 +82,7 @@ rule plot_operations:
         **rules.solve_operations.output
     output:
         price_duration="results/{run}/graphics/operations/price_duration.pdf",
+        price_duration_attributed="results/{run}/graphics/price_duration_attributed.pdf",
         price_time_series="results/{run}/graphics/operations/price_time_series.pdf",
         mu_energy_balance="results/{run}/graphics/operations/mu_energy_balance.pdf",
         energy_balance="results/{run}/graphics/operations/energy_balance.pdf",
@@ -89,6 +91,23 @@ rule plot_operations:
         **{sns: "results/{run}/graphics/operations/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     script:
         "scripts/plot.py"
+
+
+rule plot_price_durations:
+    input:
+        scenarios=SCENARIO_FN,
+        matplotlibrc="matplotlibrc",
+        networks=lambda w: expand(f"results/{run}/network.nc" for run in config["price_duration_curve"]["scenarios"][w.key])
+    output:
+        price_durations="results/graphics/{key}/price_durations.pdf",
+        price_durations_log="results/graphics/{key}/price_durations_log.pdf",
+    script:
+        "scripts/price_duration.py"
+
+
+rule plot_all_price_durations:
+    input:
+        expand(rules.plot_price_durations.output[0], key=config["price_duration_curve"]["scenarios"].keys())
 
 
 rule plot_all:
