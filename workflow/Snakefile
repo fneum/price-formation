@@ -167,8 +167,8 @@ rule receive:
     params:
         receive_ignore = config["cluster-sync"]["receive-ignore"],
         url = config["cluster-sync"]["url"],
-        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"],
+        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"] + "/",
     shell:
         """
-        rsync -ravzh --progress --delete --exclude-from={params.receive_ignore} {params.url}:{params.cluster_base_dir} .
+        rsync -ravzh --progress --update --exclude-from={params.receive_ignore} {params.url}:{params.cluster_base_dir} . -n
         """
