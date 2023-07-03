@@ -34,9 +34,16 @@ snapshots:
   inclusive: left
   freq: 1H
 
+cluster-sync:
+    url: zecm
+    send-ignore: .syncignore-send
+    receive-ignore: .syncignore-receive
+    cluster-base-dir: /scratch/fneum/projects/price-formation
+
 solver:
   name: gurobi
   options: gurobi-default
+  mem_mb: 8000
 
 solver_options:
   gurobi-default:

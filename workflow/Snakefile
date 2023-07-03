@@ -27,6 +27,8 @@ rule download_technology_data:
         scenarios=SCENARIO_FN,
     output:
         tech_data="results/{run}/technology_data.csv",
+    conda:
+        "envs/environment.yaml"
     script:
         "scripts/download_tech_data.py"
 
@@ -41,6 +43,10 @@ rule solve:
         network="results/{run}/network.nc",
         energy_balance="results/{run}/summary/energy_balance.csv",
         statistics="results/{run}/summary/statistics.csv",
+    resources: mem_mb=config["solver"]["mem_mb"]
+    threads: 4
+    conda:
+        "envs/environment.yaml"
     script:
         "scripts/solve.py"
 
@@ -59,6 +65,8 @@ rule plot:
         hydrogen_bidding="results/{run}/graphics/hydrogen_bidding.pdf",
         battery_bidding="results/{run}/graphics/battery_bidding.pdf",
         **{sns: "results/{run}/graphics/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+    conda:
+        "envs/environment.yaml"
     script:
         "scripts/plot.py"
 
@@ -71,6 +79,10 @@ rule solve_operations:
         network="results/{run}/networks_operations.nc",
         energy_balance="results/{run}/summary/operations/energy_balance.csv",
         statistics="results/{run}/summary/operations/statistics.csv",
+    resources: mem_mb=config["solver"]["mem_mb"]
+    threads: 4
+    conda:
+        "envs/environment.yaml"
     script:
         "scripts/solve_operations.py"
 
@@ -89,6 +101,8 @@ rule plot_operations:
         hydrogen_bidding="results/{run}/graphics/operations/hydrogen_bidding.pdf",
         battery_bidding="results/{run}/graphics/operations/battery_bidding.pdf",
         **{sns: "results/{run}/graphics/operations/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+    conda:
+        "envs/environment.yaml"
     script:
         "scripts/plot.py"
 
@@ -101,6 +115,8 @@ rule plot_price_durations:
     output:
         price_durations="results/graphics/{key}/price_durations.pdf",
         price_durations_log="results/graphics/{key}/price_durations_log.pdf",
+    conda:
+        "envs/environment.yaml"
     script:
         "scripts/price_duration.py"
 
@@ -128,3 +144,31 @@ rule plot_operations_all:
 rule solve_operations_all:
     input:
         expand(rules.solve_operations.output[0], run=scenarios.keys())
+
+rule clean:
+    run:
+         import shutil
+
+         shutil.rmtree("results")
+
+
+rule send:
+    params:
+        send_ignore = config["cluster-sync"]["send-ignore"],
+        url = config["cluster-sync"]["url"],
+        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"]
+    shell:
+        """
+        rsync -ravzh --progress --delete --no-g . --exclude-from={params.send_ignore} {params.url}:{params.cluster_base_dir}
+        """
+
+
+rule receive:
+    params:
+        receive_ignore = config["cluster-sync"]["receive-ignore"],
+        url = config["cluster-sync"]["url"],
+        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"],
+    shell:
+        """
+        rsync -ravzh --progress --delete --exclude-from={params.receive_ignore} {params.url}:{params.cluster_base_dir} .
+        """
