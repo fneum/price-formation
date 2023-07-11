@@ -12,6 +12,5 @@ __pycache__
 # project specific
 
 researchdata.reading.ac.uk
-resources
 results
 gurobi.log
