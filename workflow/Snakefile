@@ -43,7 +43,9 @@ rule solve:
         network="results/{run}/network.nc",
         energy_balance="results/{run}/summary/energy_balance.csv",
         statistics="results/{run}/summary/statistics.csv",
-    resources: mem_mb=config["solver"]["mem_mb"]
+    resources: 
+        mem_mb=config["solver"]["mem_mb"],
+        walltime=config["solver"]["walltime"],
     threads: 4
     conda:
         "envs/environment.yaml"
@@ -79,7 +81,9 @@ rule solve_operations:
         network="results/{run}/networks_operations.nc",
         energy_balance="results/{run}/summary/operations/energy_balance.csv",
         statistics="results/{run}/summary/operations/statistics.csv",
-    resources: mem_mb=config["solver"]["mem_mb"]
+    resources:
+        mem_mb=config["solver"]["mem_mb"],
+        walltime=config["solver"]["walltime"],
     threads: 4
     conda:
         "envs/environment.yaml"
@@ -156,10 +160,11 @@ rule send:
     params:
         send_ignore = config["cluster-sync"]["send-ignore"],
         url = config["cluster-sync"]["url"],
-        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"]
+        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"],
+        custom_args = config["cluster-sync"]["custom-args"],
     shell:
         """
-        rsync -ravzh --progress --delete --no-g . --exclude-from={params.send_ignore} {params.url}:{params.cluster_base_dir}
+        rsync -ravzh --progress --update --no-g {params.custom_args} . --exclude-from={params.send_ignore} {params.url}:{params.cluster_base_dir}
         """
 
 
@@ -168,7 +173,8 @@ rule receive:
         receive_ignore = config["cluster-sync"]["receive-ignore"],
         url = config["cluster-sync"]["url"],
         cluster_base_dir = config["cluster-sync"]["cluster-base-dir"] + "/",
+        custom_args = config["cluster-sync"]["custom-args"],
     shell:
         """
-        rsync -ravzh --progress --update --exclude-from={params.receive_ignore} {params.url}:{params.cluster_base_dir} .
+        rsync -ravzh --progress --update --exclude-from={params.receive_ignore} {params.custom_args} {params.url}:{params.cluster_base_dir} .
         """
