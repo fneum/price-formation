@@ -70,10 +70,3 @@ elastic-200-nobat-zero:
   inelastic: false
   elastic_intercept: 200
   battery: false
-# elastic-70a-zero:
-#   inelastic: false
-#   zero_cost_storage: true
-#   elastic: true
-#   snapshots:
-#     start: "1950-01-01"
-#     end: "2021-01-01"

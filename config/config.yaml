@@ -29,8 +29,8 @@ technology_data:
     discount rate: 0.07
 
 snapshots:
-  start: "2010-01-01"
-  end: "2011-01-01"
+  start: "1950-01-01"
+  end: "2021-01-01"
   inclusive: left
   freq: 1H
 
@@ -39,11 +39,13 @@ cluster-sync:
     send-ignore: .syncignore-send
     receive-ignore: .syncignore-receive
     cluster-base-dir: /scratch/fneum/projects/price-formation
+    custom-args: "" # e.g. -n for dry-run
 
 solver:
   name: gurobi
   options: gurobi-default
-  mem_mb: 8000
+  mem_mb: 16000
+  walltime: "24:00:00"
 
 solver_options:
   gurobi-default:
