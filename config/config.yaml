@@ -52,7 +52,7 @@ solver_options:
     threads: 4
     method: 2 # barrier
     crossover: 0
-    BarConvTol: 1.e-7
+    BarConvTol: 1.e-8
     Seed: 123
     AggFill: 0
     PreDual: 0
