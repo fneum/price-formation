@@ -62,7 +62,7 @@ solver_options:
 myopic:
   horizon: 72
   overlap: 48
-  prefect_foresight: false
+  perfect_foresight: false
   cyclic: false
   battery_bid: "series" # or 'mean' or float
   hydrogen_bid: "series" # or 'mean' or float
