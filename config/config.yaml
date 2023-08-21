@@ -59,6 +59,27 @@ solver_options:
     GURO_PAR_BARDENSETHRESH: 200
     seed: 10
 
+myopic:
+  horizon: 72
+  overlap: 48
+  prefect_foresight: false
+  cyclic: false
+  battery_bid: "series" # or 'mean' or float
+  hydrogen_bid: "series" # or 'mean' or float
+  perturbation: [] # pattern: <carrier: factor>
+  number_years: 50
+  random_years: false
+
+planning:
+  number_years: false
+  random_years: false
+
+export_to_netcdf:
+  float32: true
+  compression:
+    zlib: true
+    complevel: 9
+    least_significant_digit: 5
 
 colors:
   wind: "#2b90d4"

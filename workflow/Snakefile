@@ -33,14 +33,26 @@ rule download_technology_data:
         "scripts/download_tech_data.py"
 
 
-rule solve:
+rule prepare:
     input:
         scenarios=SCENARIO_FN,
         onwind_cf="resources/reading/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
         solar_cf="resources/reading/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
         tech_data="results/{run}/technology_data.csv",
     output:
-        network="results/{run}/network.nc",
+        network="results/{run}/network-prepared.nc",
+    conda:
+        "envs/environment.yaml"
+    script:
+        "scripts/prepare.py"
+
+
+rule solve:
+    input:
+        scenarios=SCENARIO_FN,
+        network="results/{run}/network-prepared.nc",
+    output:
+        network="results/{run}/network-solved.nc",
         energy_balance="results/{run}/summary/energy_balance.csv",
         statistics="results/{run}/summary/statistics.csv",
     resources: 
@@ -73,12 +85,13 @@ rule plot:
         "scripts/plot.py"
 
 
-rule solve_operations:
+rule solve_myopic_dispatch:
     input:
         scenarios=SCENARIO_FN,
-        network="results/{run}/network.nc"
+        prepared_network="results/{run}/network-prepared.nc",
+        solved_network="results/{run}/network-solved.nc",
     output:
-        network="results/{run}/networks_operations.nc",
+        network="results/{run}/network-myopic.nc",
         energy_balance="results/{run}/summary/operations/energy_balance.csv",
         statistics="results/{run}/summary/operations/statistics.csv",
     resources:
@@ -88,14 +101,14 @@ rule solve_operations:
     conda:
         "envs/environment.yaml"
     script:
-        "scripts/solve_operations.py"
+        "scripts/solve_myopic_dispatch.py"
 
 
-rule plot_operations:
+rule plot_myopic_dispatch:
     input:
         scenarios=SCENARIO_FN,
         matplotlibrc="matplotlibrc",
-        **rules.solve_operations.output
+        **rules.solve_myopic_dispatch.output
     output:
         price_duration="results/{run}/graphics/operations/price_duration.pdf",
         price_duration_attributed="results/{run}/graphics/price_duration_attributed.pdf",
@@ -115,7 +128,7 @@ rule plot_price_durations:
     input:
         scenarios=SCENARIO_FN,
         matplotlibrc="matplotlibrc",
-        networks=lambda w: expand(f"results/{run}/network.nc" for run in config["price_duration_curve"]["scenarios"][w.key])
+        networks=lambda w: expand(f"results/{run}/network-solved.nc" for run in config["price_duration_curve"]["scenarios"][w.key])
     output:
         price_durations="results/graphics/{key}/price_durations.pdf",
         price_durations_log="results/graphics/{key}/price_durations_log.pdf",
@@ -140,14 +153,19 @@ rule solve_all:
         expand(rules.solve.output[0], run=scenarios.keys())
 
 
-rule plot_operations_all:
+rule prepare_all:
     input:
-        expand(rules.plot_operations.output[0], run=scenarios.keys())
+        expand(rules.prepare.output[0], run=scenarios.keys())
 
 
-rule solve_operations_all:
+rule plot_myopic_dispatch_all:
     input:
-        expand(rules.solve_operations.output[0], run=scenarios.keys())
+        expand(rules.plot_myopic_dispatch.output[0], run=scenarios.keys())
+
+
+rule solve_myopic_dispatch_all:
+    input:
+        expand(rules.solve_myopic_dispatch.output[0], run=scenarios.keys())
 
 rule clean:
     run:

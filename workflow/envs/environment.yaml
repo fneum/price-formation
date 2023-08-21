@@ -10,7 +10,8 @@ channels:
 dependencies:
 - python==3.11
 - pip
-- pypsa==0.24
+- pypsa==0.25.1
+- linopy>=0.2.5
 - snakemake-minimal
 - pandas
 - numpy
