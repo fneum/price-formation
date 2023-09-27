@@ -1,11 +1,31 @@
+import ast
 from pathlib import Path
-from snakemake.utils import update_config
-import yaml
 
-def set_scenario_config(config, scenarios_fn, key):
-    with open(scenarios_fn, "r") as f:
-        scenarios = yaml.safe_load(f)
-    update_config(config, scenarios[key])
+from snakemake.utils import update_config
+
+
+def literal_eval(s):
+    try:
+        return ast.literal_eval(s.capitalize())
+    except (ValueError, SyntaxError):
+        return s
+
+
+def parse_to_dict(s):
+    d = {}
+    for item in s.split('-'):
+        key, value = item.split('+', 1)
+        d[key] = parse_to_dict(value) if '+' in value else literal_eval(value)
+    return d
+
+
+def set_scenario_config(config, wildcards):
+    for wc_key, wc_string in wildcards.items():
+        if wc_string is not None:
+            wc_dict = parse_to_dict(wc_string)
+            if wc_key == "st":
+                wc_dict = dict(myopic=wc_dict)
+            update_config(config, wc_dict)
 
 
 def mock_snakemake(rulename, configfiles=[], **wildcards):

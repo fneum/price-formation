@@ -7,11 +7,10 @@ HTTP = HTTPRemoteProvider()
 
 configfile: "config/config.yaml"
 
-SCENARIO_FN = "config/scenarios.yaml"
+wildcard_constraints:
+    lt="[^/]+" # cannot include folder separators
 
-with open(SCENARIO_FN, "r") as f:
-    scenarios = yaml.safe_load(f)
-
+RESULTS = "results/" + (config["run"] + "/" if config["run"] else "")
 
 rule download_weather_data:
     input:
@@ -23,10 +22,8 @@ rule download_weather_data:
 
 
 rule download_technology_data:
-    input:
-        scenarios=SCENARIO_FN,
     output:
-        tech_data="results/{run}/technology_data.csv",
+        tech_data=RESULTS + "technology_data.csv",
     conda:
         "envs/environment.yaml"
     script:
@@ -35,12 +32,11 @@ rule download_technology_data:
 
 rule prepare:
     input:
-        scenarios=SCENARIO_FN,
         onwind_cf="resources/reading/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc",
         solar_cf="resources/reading/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc",
-        tech_data="results/{run}/technology_data.csv",
+        tech_data=RESULTS + "technology_data.csv",
     output:
-        network="results/{run}/network-prepared.nc",
+        network=RESULTS + "network_prepared_LT-{lt}.nc",
     conda:
         "envs/environment.yaml"
     script:
@@ -49,12 +45,11 @@ rule prepare:
 
 rule solve:
     input:
-        scenarios=SCENARIO_FN,
-        network="results/{run}/network-prepared.nc",
+        network=RESULTS + "network_prepared_LT-{lt}.nc",
     output:
-        network="results/{run}/network-solved.nc",
-        energy_balance="results/{run}/summary/energy_balance.csv",
-        statistics="results/{run}/summary/statistics.csv",
+        network=RESULTS + "network_solved_LT-{lt}.nc",
+        energy_balance=RESULTS + "summary/LT-{lt}/energy_balance.csv",
+        statistics=RESULTS + "summary/LT-{lt}/statistics.csv",
     resources: 
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
@@ -67,18 +62,16 @@ rule solve:
 
 rule plot:
     input:
-        scenarios=SCENARIO_FN,
         matplotlibrc="matplotlibrc",
         **rules.solve.output
     output:
-        price_duration="results/{run}/graphics/price_duration.pdf",
-        price_duration_attributed="results/{run}/graphics/price_duration_attributed.pdf",
-        price_time_series="results/{run}/graphics/price_time_series.pdf",
-        mu_energy_balance="results/{run}/graphics/mu_energy_balance.pdf",
-        energy_balance="results/{run}/graphics/energy_balance.pdf",
-        hydrogen_bidding="results/{run}/graphics/hydrogen_bidding.pdf",
-        battery_bidding="results/{run}/graphics/battery_bidding.pdf",
-        **{sns: "results/{run}/graphics/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+        price_duration=RESULTS + "graphics/LT-{lt}/price_duration.pdf",
+        price_time_series=RESULTS + "graphics/LT-{lt}/price_time_series.pdf",
+        mu_energy_balance=RESULTS + "graphics/LT-{lt}/mu_energy_balance.pdf",
+        energy_balance=RESULTS + "graphics/LT-{lt}/energy_balance.pdf",
+        hydrogen_bidding=RESULTS + "graphics/LT-{lt}/hydrogen_bidding.pdf",
+        battery_bidding=RESULTS + "graphics/LT-{lt}/battery_bidding.pdf",
+        **{sns: RESULTS + "graphics/LT-{lt}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     conda:
         "envs/environment.yaml"
     script:
@@ -87,13 +80,12 @@ rule plot:
 
 rule solve_myopic_dispatch:
     input:
-        scenarios=SCENARIO_FN,
-        prepared_network="results/{run}/network-prepared.nc",
-        solved_network="results/{run}/network-solved.nc",
+        prepared_network=RESULTS + "network_prepared_LT-{lt}.nc",
+        solved_network=RESULTS + "network_solved_LT-{lt}.nc",
     output:
-        network="results/{run}/network-myopic.nc",
-        energy_balance="results/{run}/summary/operations/energy_balance.csv",
-        statistics="results/{run}/summary/operations/statistics.csv",
+        network=RESULTS + "network_myopic_LT-{lt}_ST-{st}.nc",
+        energy_balance=RESULTS + "summary/LT-{lt}/ST-{st}/energy_balance.csv",
+        statistics=RESULTS + "summary/LT-{lt}/ST-{st}/statistics.csv",
     resources:
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
@@ -106,66 +98,21 @@ rule solve_myopic_dispatch:
 
 rule plot_myopic_dispatch:
     input:
-        scenarios=SCENARIO_FN,
         matplotlibrc="matplotlibrc",
         **rules.solve_myopic_dispatch.output
     output:
-        price_duration="results/{run}/graphics/operations/price_duration.pdf",
-        price_duration_attributed="results/{run}/graphics/price_duration_attributed.pdf",
-        price_time_series="results/{run}/graphics/operations/price_time_series.pdf",
-        mu_energy_balance="results/{run}/graphics/operations/mu_energy_balance.pdf",
-        energy_balance="results/{run}/graphics/operations/energy_balance.pdf",
-        hydrogen_bidding="results/{run}/graphics/operations/hydrogen_bidding.pdf",
-        battery_bidding="results/{run}/graphics/operations/battery_bidding.pdf",
-        **{sns: "results/{run}/graphics/operations/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+        price_duration=RESULTS + "graphics/LT-{lt}/ST-{st}/price_duration.pdf",
+        price_time_series=RESULTS + "graphics/LT-{lt}/ST-{st}/price_time_series.pdf",
+        mu_energy_balance=RESULTS + "graphics/LT-{lt}/ST-{st}/mu_energy_balance.pdf",
+        energy_balance=RESULTS + "graphics/LT-{lt}/ST-{st}/energy_balance.pdf",
+        hydrogen_bidding=RESULTS + "graphics/LT-{lt}/ST-{st}/hydrogen_bidding.pdf",
+        battery_bidding=RESULTS + "graphics/LT-{lt}/ST-{st}/battery_bidding.pdf",
+        **{sns: RESULTS + "graphics/LT-{lt}/ST-{st}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     conda:
         "envs/environment.yaml"
     script:
         "scripts/plot.py"
 
-
-rule plot_price_durations:
-    input:
-        scenarios=SCENARIO_FN,
-        matplotlibrc="matplotlibrc",
-        networks=lambda w: expand(f"results/{run}/network-solved.nc" for run in config["price_duration_curve"]["scenarios"][w.key])
-    output:
-        price_durations="results/graphics/{key}/price_durations.pdf",
-        price_durations_log="results/graphics/{key}/price_durations_log.pdf",
-    conda:
-        "envs/environment.yaml"
-    script:
-        "scripts/price_duration.py"
-
-
-rule plot_all_price_durations:
-    input:
-        expand(rules.plot_price_durations.output[0], key=config["price_duration_curve"]["scenarios"].keys())
-
-
-rule plot_all:
-    input:
-        expand(rules.plot.output[0], run=scenarios.keys())
-
-
-rule solve_all:
-    input:
-        expand(rules.solve.output[0], run=scenarios.keys())
-
-
-rule prepare_all:
-    input:
-        expand(rules.prepare.output[0], run=scenarios.keys())
-
-
-rule plot_myopic_dispatch_all:
-    input:
-        expand(rules.plot_myopic_dispatch.output[0], run=scenarios.keys())
-
-
-rule solve_myopic_dispatch_all:
-    input:
-        expand(rules.solve_myopic_dispatch.output[0], run=scenarios.keys())
 
 rule clean:
     run:
@@ -196,3 +143,28 @@ rule receive:
         """
         rsync -ravzh --progress --update --exclude-from={params.receive_ignore} {params.custom_args} {params.url}:{params.cluster_base_dir} .
         """
+
+
+rule all:
+    input:
+        expand(rules.plot_myopic_dispatch.output[0], **config["scenario"])
+
+
+rule solve_myopic_dispatch_all:
+    input:
+        expand(rules.solve_myopic_dispatch.output[0], **config["scenario"])
+
+
+rule plot_all:
+    input:
+        expand(rules.plot.output[0], **config["scenario"])
+
+
+rule solve_all:
+    input:
+        expand(rules.solve.output[0], **config["scenario"])
+
+
+rule prepare_all:
+    input:
+        expand(rules.prepare.output[0], **config["scenario"])

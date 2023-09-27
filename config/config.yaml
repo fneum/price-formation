@@ -1,10 +1,30 @@
+run: "default"
+
+scenario:
+  lt:
+  - country+DE-number_years+1-inelastic+true
+  - country+DE-number_years+1-elastic+true-elastic_intercept+200
+  - country+DE-number_years+1-elastic+true-elastic_intercept+2000
+  - country+DE-number_years+1-elastic+true-elastic_intercept+20000
+  - country+ES-number_years+1-inelastic+true
+  - country+ES-number_years+1-elastic+true-elastic_intercept+200
+  - country+ES-number_years+1-elastic+true-elastic_intercept+2000
+  - country+ES-number_years+1-elastic+true-elastic_intercept+20000
+  st:
+  - number_years+1-horizon+96-overlap+24
+  - number_years+1-horizon+96-overlap+24-perturbation+0.99
+  - number_years+1-horizon+96-overlap+24-perturbation+1.01
+  - number_years+1-horizon+72-overlap+24
+  - number_years+1-horizon+48-overlap+24
+  - number_years+1-perfect_foresight+true
+
 country: DE
 
 load: 100 # MW
 
 voll: false
 elastic: false
-inelastic: true
+inelastic: false
 
 wind: true
 solar: true
@@ -14,6 +34,9 @@ battery: true
 
 elastic_intercept: 2000 # €/MWh
 voll_price: 2000 # €/MWh
+
+number_years: false
+random_years: true
 
 zero_cost_storage: false
 
@@ -64,13 +87,9 @@ myopic:
   overlap: 48
   perfect_foresight: false
   cyclic: false
-  battery_bid: "series" # or 'mean' or float
-  hydrogen_bid: "series" # or 'mean' or float
-  perturbation: [] # pattern: <carrier: factor>
-  number_years: 50
-  random_years: false
-
-planning:
+  battery_bid: "mean" # or 'mean' or float
+  hydrogen_bid: "mean" # or 'mean' or float
+  perturbation: 1 # pattern: <carrier: factor>
   number_years: false
   random_years: false
 
@@ -115,27 +134,3 @@ supply_demand_curve:
     - 2010-03-01 16:00
     - 2010-01-01 00:00
   ylim_max: 2000
-
-price_duration_curve:
-  scenarios:
-    elasticity-nobat:
-      - inelastic-nobat
-      - elastic-200-nobat
-      - elastic-2000-nobat
-      - elastic-20000-nobat
-    elasticity:
-      - inelastic
-      - elastic-200
-      - elastic-2000
-      - elastic-20000
-    elasticity-nobat-zero:
-      - inelastic-nobat-zero
-      - elastic-200-nobat-zero
-      - elastic-2000-nobat-zero
-      - elastic-20000-nobat-zero
-    elasticity-zero:
-      - inelastic
-      - elastic-200
-      - elastic-2000
-      - elastic-20000
-    

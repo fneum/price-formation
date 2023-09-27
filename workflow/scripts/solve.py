@@ -1,11 +1,12 @@
-import pypsa
+import logging
 
+import pypsa
 from helpers import set_scenario_config
 
-import logging
 logger = logging.getLogger(__name__)
 
 import random
+
 random.seed(123)
 
 
@@ -70,24 +71,24 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("solve", run='inelastic')
+        snakemake = mock_snakemake("solve", lt='inelastic+true')
 
     set_scenario_config(
         snakemake.config,
-        snakemake.input.scenarios,
-        snakemake.wildcards.run,
+        snakemake.wildcards,
     )
     
     n = pypsa.Network(snakemake.input.network)
 
-    kwargs = snakemake.config["planning"]
-    set_snapshots(n, **kwargs)
+    set_snapshots(
+        n, 
+        snakemake.config["number_years"],
+        snakemake.config["random_years"],
+    )
 
     solve_network(n, snakemake.config)
 
     n.meta = snakemake.config
-
-    n.meta["run"] = snakemake.wildcards.run
 
     export_kwargs = snakemake.config["export_to_netcdf"]
     n.export_to_netcdf(snakemake.output.network, **export_kwargs)

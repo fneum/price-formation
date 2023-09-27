@@ -15,7 +15,7 @@ mamba create -f workflow/envs/environment.yaml
 From root of repository:
 
 ```sh
-snakemake -call --useconda plot_all
+snakemake -call --use-conda plot_all
 ```
 
 ## Cluster

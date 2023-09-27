@@ -1,5 +1,5 @@
 font.family: sans-serif
-font.sans-serif: Roboto
+font.sans-serif: Arial, Roboto, DejaVu Sans
 image.cmap: viridis
 axes.grid: false
 legend.frameon: false
@@ -10,3 +10,6 @@ axes.spines.bottom: true
 axes.spines.top: true
 axes.spines.right: true
 figure.figsize: 7, 5
+figure.autolayout : true
+figure.constrained_layout.use : true
+figure.dpi : 400

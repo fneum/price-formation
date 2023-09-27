@@ -11,7 +11,7 @@ dependencies:
 - python==3.11
 - pip
 - pypsa==0.25.1
-- linopy>=0.2.5
+- linopy>=0.2.6
 - snakemake-minimal
 - pandas
 - numpy

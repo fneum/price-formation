@@ -1,11 +1,9 @@
-import pypsa
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-
-from pypsa.descriptors import get_switchable_as_dense as as_dense
-
+import numpy as np
+import pandas as pd
+import pypsa
 from helpers import set_scenario_config
+from pypsa.descriptors import get_switchable_as_dense as as_dense
 
 
 def get_hydrogen_bids(n, sns=None):
@@ -56,63 +54,6 @@ def plot_price_duration(n):
     )
 
     plt.savefig(snakemake.output.price_duration)
-
-
-def plot_price_duration_attributed(n, tol=0.02):
-    """EXPERIMENTAL"""
-    mcp = n.buses_t.marginal_price["electricity"]
-
-    set_by = pd.DataFrame(index=n.snapshots)
-
-    set_by["VRE"] = mcp <= tol
-
-    if snakemake.config["hydrogen"]:
-        el_bids, fc_bids = get_hydrogen_bids(n)
-        set_by["electrolyser"] = (mcp <= (1 + tol) * el_bids) & (
-            mcp >= (1 - tol) * el_bids
-        )
-        set_by["fuel cell"] = (mcp <= (1 + tol) * fc_bids) & (
-            mcp >= (1 - tol) * fc_bids
-        )
-
-    if snakemake.config["battery"]:
-        ch_bids, dch_bids = get_battery_bids(n)
-        set_by["battery charger"] = (mcp <= (1 + tol) * ch_bids) & (
-            mcp >= (1 - tol) * ch_bids
-        )
-        set_by["battery discharger"] = (mcp <= (1 + tol) * dch_bids) & (
-            mcp >= (1 - tol) * dch_bids
-        )
-
-    set_by["demand"] = ~set_by.any(axis=1)
-
-    print(set_by.sum(axis=1).value_counts())
-
-    mcp = mcp.sort_values(ascending=False)
-
-    fig, ax = plt.subplots(figsize=(4, 4))
-
-    for s in [
-        "VRE",
-        "battery charger",
-        "battery discharger",
-        "electrolyser",
-        "fuel cell",
-        "demand",
-    ]:
-        if not s in set_by:
-            continue
-        mcp.where(set_by[s]).reset_index(drop=True).plot(label=s, ax=ax, linewidth=1)
-
-    plt.ylim(-0.03 * mcp.max(), mcp.max())
-    plt.xlim(0, len(mcp))
-    plt.ylabel("Electricity Price [€/MWh]")
-    plt.xlabel("Hours [h]")
-    ax.grid()
-
-    plt.legend(title="price set by", fontsize="medium")
-
-    plt.savefig(snakemake.output.price_duration_attributed)
 
 
 def plot_price_time_series(n):
@@ -368,12 +309,12 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("plot", run="elastic-200")
+        snakemake = mock_snakemake("plot", lt="inelastic+true")
+        # snakemake = mock_snakemake("plot_myopic_dispatch", lt="inelastic+true", st="horizon+96")
 
     set_scenario_config(
         snakemake.config,
-        snakemake.input.scenarios,
-        snakemake.wildcards.run,
+        snakemake.wildcards,
     )
 
     plt.style.use(["bmh", snakemake.input.matplotlibrc])
@@ -400,15 +341,3 @@ if __name__ == "__main__":
 
     for sns in snakemake.config["supply_demand_curve"]["snapshots"]:
         plot_supply_demand_curve(n, sns)
-
-    sto = "hydrogen storage"
-    
-    lambda_ene = n.stores_t.mu_energy_balance[sto]
-
-    mu_lower = n.stores_t.mu_lower
-
-    mu_upper = n.stores_t.mu_upper
-
-    lambda_h2 = n.buses_t.marginal_price["hydrogen"]
-
-    lambda_el = n.buses_t.marginal_price["electricity"]

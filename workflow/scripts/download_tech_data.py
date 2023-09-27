@@ -1,5 +1,4 @@
 import pandas as pd
-
 from helpers import set_scenario_config
 
 if __name__ == "__main__":
@@ -10,8 +9,7 @@ if __name__ == "__main__":
 
     set_scenario_config(
         snakemake.config,
-        snakemake.input.scenarios,
-        snakemake.wildcards.run,
+        snakemake.wildcards,
     )
 
     config = snakemake.config["technology_data"]

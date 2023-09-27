@@ -1,11 +1,11 @@
-import pypsa
+import logging
+
 import numpy as np
 import pandas as pd
+import pypsa
 import xarray as xr
-
 from helpers import set_scenario_config
 
-import logging
 logger = logging.getLogger(__name__)
 
 def annuity(r, n):
@@ -185,12 +185,11 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("prepare", run='inelastic')
+        snakemake = mock_snakemake("prepare", lt='country+ES-number_years+1-elastic+true-elastic_intercept+20000')
 
     set_scenario_config(
         snakemake.config,
-        snakemake.input.scenarios,
-        snakemake.wildcards.run,
+        snakemake.wildcards,
     )
 
     country = snakemake.config["country"]
@@ -228,8 +227,6 @@ if __name__ == "__main__":
         n.stores.loc[:, "capital_cost"] = 0
 
     n.meta = snakemake.config
-
-    n.meta["run"] = snakemake.wildcards.run
 
     export_kwargs = snakemake.config["export_to_netcdf"]
     n.export_to_netcdf(snakemake.output.network, **export_kwargs)
