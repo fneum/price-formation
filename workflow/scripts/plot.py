@@ -327,8 +327,6 @@ if __name__ == "__main__":
 
     plot_price_duration(n)
 
-    plot_price_duration_attributed(n)
-
     plot_price_time_series(n)
 
     plot_mu_energy_balance(n)
