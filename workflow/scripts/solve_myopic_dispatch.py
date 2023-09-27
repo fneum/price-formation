@@ -78,6 +78,8 @@ if __name__ == "__main__":
         status, condition = n.optimize.optimize_with_rolling_horizon(
             solver_name=solver_name,
             solver_options=solver_options,
+            horizon=snakemake.config["myopic"]["horizon"],
+            overlap=snakemake.config["myopic"]["overlap"],
         )
 
     export_kwargs = snakemake.config["export_to_netcdf"]
