@@ -37,11 +37,12 @@ if __name__ == "__main__":
 
     hydrogen_bid = snakemake.config["myopic"]["hydrogen_bid"]
     if hydrogen_bid == "series":
-        n.stores_t.marginal_cost["hydrogen storage"] = n.buses_t.marginal_price[
+        # this only works if long-term and short-term model share same snapshots
+        n.stores_t.marginal_cost["hydrogen storage"] = n_solved.buses_t.marginal_price[
             "hydrogen"
         ]
     elif hydrogen_bid == "mean":
-        n.stores.at["hydrogen storage", "marginal_cost"] = n.buses_t.marginal_price[
+        n.stores.at["hydrogen storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
             "hydrogen"
         ].mean()
     elif isinstance(hydrogen_bid, (float, int)):
@@ -49,11 +50,12 @@ if __name__ == "__main__":
 
     battery_bid = snakemake.config["myopic"]["battery_bid"]
     if battery_bid == "series":
-        n.stores_t.marginal_cost["battery storage"] = n.buses_t.marginal_price[
+        # this only works if long-term and short-term model share same snapshots
+        n.stores_t.marginal_cost["battery storage"] = n_solved.buses_t.marginal_price[
             "battery"
         ]
     elif battery_bid == "mean":
-        n.stores.at["battery storage", "marginal_cost"] = n.buses_t.marginal_price[
+        n.stores.at["battery storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
             "battery"
         ].mean()
     elif isinstance(battery_bid, (float, int)):
@@ -83,12 +85,12 @@ if __name__ == "__main__":
     )
 
     if snakemake.config["myopic"]["perfect_foresight"]:
-        status, condition = n.optimize(
+        n.optimize(
             solver_name=solver_name,
             solver_options=solver_options,
         )
     else:
-        status, condition = n.optimize.optimize_with_rolling_horizon(
+        n.optimize.optimize_with_rolling_horizon(
             solver_name=solver_name,
             solver_options=solver_options,
             horizon=snakemake.config["myopic"]["horizon"],
