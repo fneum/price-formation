@@ -73,6 +73,7 @@ rule plot:
         hydrogen_bidding=RESULTS + "graphics/LT-{lt}/hydrogen_bidding.pdf",
         battery_bidding=RESULTS + "graphics/LT-{lt}/battery_bidding.pdf",
         cost_recovery=RESULTS + "graphics/LT-{lt}/cost_recovery.pdf",
+        soc=RESULTS + "graphics/LT-{lt}/soc.pdf",
         **{sns: RESULTS + "graphics/LT-{lt}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     conda:
         "envs/environment.yaml"
@@ -111,6 +112,7 @@ rule plot_myopic_dispatch:
         hydrogen_bidding=RESULTS + "graphics/LT-{lt}/ST-{st}/hydrogen_bidding.pdf",
         battery_bidding=RESULTS + "graphics/LT-{lt}/ST-{st}/battery_bidding.pdf",
         cost_recovery=RESULTS + "graphics/LT-{lt}/ST-{st}/cost_recovery.pdf",
+        soc=RESULTS + "graphics/LT-{lt}/ST-{st}/soc.pdf",
         **{sns: RESULTS + "graphics/LT-{lt}/ST-{st}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     conda:
         "envs/environment.yaml"

@@ -175,6 +175,34 @@ def plot_mu_energy_balance(n):
     plt.savefig(snakemake.output.mu_energy_balance)
 
 
+def plot_state_of_charge(n):
+
+    soc = n.stores_t.e / n.stores.e_nom_opt * 100
+
+    soc.reset_index(drop=True, inplace=True)
+
+    colors = n.carriers.color.to_dict()
+    colors.update({"battery storage": "lightgrey"})
+
+    fig, ax = plt.subplots()
+
+    soc.plot(
+        ax=ax,
+        color=soc.columns.map(colors),
+        ylabel="State of Charge [%]",
+        xlabel="",
+        ylim=(0, 100)
+    )
+
+    plt.legend(title="", bbox_to_anchor=(0.2, 1.02), ncol=2)
+
+    set_xticks(ax, n.snapshots)
+
+    plt.xlim(soc.index[0], soc.index[-1])
+
+    plt.savefig(snakemake.output.soc)
+
+
 def plot_hydrogen_bidding(n):
     if not "hydrogen" in n.buses.index:
         fig, ax = plt.subplots()
@@ -458,6 +486,8 @@ if __name__ == "__main__":
     plot_price_time_series(n)
 
     plot_mu_energy_balance(n)
+
+    plot_state_of_charge(n)
 
     plot_hydrogen_bidding(n)
 

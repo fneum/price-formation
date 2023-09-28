@@ -115,6 +115,7 @@ colors:
   hydrogen fuel cell: "#e16d26"
   hydrogen electrolyser: "#ce317c"
   hydrogen underground storage: "#9723dc"
+  hydrogen storage: "#9723dc"
   electricity: "#7eae51"
   load: "#7eae51"
 
