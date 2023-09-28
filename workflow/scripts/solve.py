@@ -58,6 +58,7 @@ def solve_network(n, config):
     status, condition = n.optimize(
         solver_name=config["solver"]["name"],
         solver_options=config["solver_options"][profile],
+        assign_all_duals=True,
         extra_functionality=add_battery_constraints
     )
 
