@@ -88,11 +88,13 @@ if __name__ == "__main__":
         n.optimize(
             solver_name=solver_name,
             solver_options=solver_options,
+            assign_all_duals=True,
         )
     else:
         n.optimize.optimize_with_rolling_horizon(
             solver_name=solver_name,
             solver_options=solver_options,
+            assign_all_duals=True,
             horizon=snakemake.config["myopic"]["horizon"],
             overlap=snakemake.config["myopic"]["overlap"],
         )
