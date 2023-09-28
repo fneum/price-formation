@@ -1,3 +1,4 @@
+import calendar
 from datetime import datetime
 
 import matplotlib.pyplot as plt
@@ -48,6 +49,28 @@ def get_battery_bids(n, sns=None):
         discharger_bid.name = "battery discharger bids"
     return charger_bid, discharger_bid
 
+
+def get_cost_recovery(n):
+    # remove artificial bids from myopic dispatch optimisation
+    carriers = n.stores.index.intersection(["hydrogen storage", "battery storage"])
+    n.stores.loc[carriers, "marginal_cost"] = 0.
+    n.stores_t.marginal_cost.loc[:, carriers] = 0.
+    def merge_battery(s):
+        if "charger" in s:
+            return "battery dis-/charging"
+        return s
+    comps = {"Generator", "Link", "Store"}
+    revenue = n.statistics.revenue(comps=comps, aggregate_time=False).droplevel(0).drop('load', errors='ignore').groupby(merge_battery).sum().div(1e6)
+    revenue = revenue.groupby(revenue.columns.month, axis=1).sum()
+
+    revenue.columns = revenue.columns.map(calendar.month_abbr.__getitem__)
+
+    costs = (n.statistics.opex() + n.statistics.capex()).droplevel(0).drop('load', errors='ignore').groupby(merge_battery).sum().div(1e6)
+
+    revenue.loc["total"] = revenue.sum()
+    costs["total"] = costs.sum()
+
+    return revenue.div(costs, axis=0) * 100
 
 def get_price_duration(n, bus="electricity"):
     df = (
@@ -356,6 +379,28 @@ def plot_supply_demand_curve(n, sns):
     plt.savefig(snakemake.output[sns])
 
 
+def plot_cost_recovery(n):
+
+    crf = get_cost_recovery(n)
+
+    fig, ax = plt.subplots(figsize=(8, 3))
+
+    crf_sum = crf.sum(axis=1)
+
+    ax.scatter(crf_sum, crf_sum.index, linewidth=0, marker=".", color='k', label='cost recovery', zorder=2)
+    crf.plot.barh(ax=ax, stacked=True, cmap='viridis')
+    plt.grid(axis="x")
+    plt.ylabel("")
+    plt.xlabel("cost recovery [%]")
+
+    for name, value in enumerate(crf_sum):
+        ax.annotate(f"{value:.1f}%", (value, name), va="center", textcoords="offset points", xytext=(5, 0))
+
+    plt.legend(loc=(-0.08, 1.04), ncol=7)
+
+    plt.savefig(snakemake.output.cost_recovery)
+
+
 if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
@@ -387,6 +432,8 @@ if __name__ == "__main__":
     plot_battery_bidding(n)
 
     plot_energy_balance(n)
+
+    plot_cost_recovery(n)
 
     for sns in snakemake.config["supply_demand_curve"]["snapshots"]:
         plot_supply_demand_curve(n, sns)
