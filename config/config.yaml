@@ -26,6 +26,8 @@ voll: false
 elastic: false
 inelastic: false
 
+voll_share: false # share of VoLL in demand
+
 wind: true
 solar: true
 

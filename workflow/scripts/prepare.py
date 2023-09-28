@@ -45,7 +45,7 @@ def load_time_series(fn, country, snapshots):
 def add_load(n, config):
     assert (
         sum([config["voll"], config["elastic"], config["inelastic"]]) == 1
-    ), "Must choose exactly one of 'voll', 'elastic', 'inelastic'"
+    ) or config["voll_share"], "Must choose exactly one of 'voll', 'elastic', 'inelastic' if elasticities are not mixed."
 
     if config["voll"]:
         logger.info("Adding demand with VOLL.")
@@ -59,21 +59,31 @@ def add_load(n, config):
             p_min_pu=-1,
             p_nom=config["load"],
         )
-    elif config["elastic"]:
+    if config["elastic"]:
         logger.info("Adding elastic demand.")
         n.add(
             "Generator",
-            "load",
+            "load-shedding",
             bus="electricity",
             carrier="load",
             marginal_cost_quadratic=config["elastic_intercept"] / ( 2 * config["load"]),
             p_nom=config["load"],
         )
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
-    elif config["inelastic"]:
+    if config["inelastic"]:
         logger.info("Adding inelastic demand.")
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
 
+    voll_share = config["voll_share"]
+    if voll_share:
+        assert sum([config["voll"], config["elastic"]]) == 2, "Need both 'voll' and 'elastic' to mix elasticities."
+        logger.info("Mixing VOLL and elastic demand.")
+        sel = n.generators.query("marginal_cost_quadratic == 0. & carrier == 'load'").index
+        n.generators.loc[sel, "p_nom"] *= voll_share
+        sel = n.generators.query("marginal_cost_quadratic != 0. & carrier == 'load'").index
+        n.generators.loc[sel, "p_nom"] *= (1 - voll_share)
+        n.generators.loc[sel, "marginal_cost_quadratic"] /= (1 - voll_share)
+        n.loads.at["load", "p_set"] *= (1 - voll_share)
 
 def add_solar(n, config, tech_data, p_max_pu):
     if not config["solar"]:
