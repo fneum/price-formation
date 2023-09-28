@@ -48,6 +48,7 @@ def add_load(n, config):
     ), "Must choose exactly one of 'voll', 'elastic', 'inelastic'"
 
     if config["voll"]:
+        logger.info("Adding demand with VOLL.")
         n.add(
             "Generator",
             "load",
@@ -59,23 +60,25 @@ def add_load(n, config):
             p_nom=config["load"],
         )
     elif config["elastic"]:
+        logger.info("Adding elastic demand.")
         n.add(
             "Generator",
-            "load-shedding",
+            "load",
             bus="electricity",
-            carrier="load-shedding",
+            carrier="load",
             marginal_cost_quadratic=config["elastic_intercept"] / ( 2 * config["load"]),
             p_nom=config["load"],
         )
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
     elif config["inelastic"]:
+        logger.info("Adding inelastic demand.")
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
 
 
 def add_solar(n, config, tech_data, p_max_pu):
     if not config["solar"]:
         return
-    
+
     n.add(
         "Generator",
         "solar",
@@ -90,7 +93,7 @@ def add_solar(n, config, tech_data, p_max_pu):
 def add_wind(n, config, tech_data, p_max_pu):
     if not config["wind"]:
         return
-    
+
     n.add(
         "Generator",
         "wind",
@@ -185,7 +188,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("prepare", lt='country+ES-number_years+1-elastic+true-elastic_intercept+20000')
+        snakemake = mock_snakemake("prepare", lt='number_years+1-elastic+true-elastic_intercept+200')
 
     set_scenario_config(
         snakemake.config,
@@ -193,15 +196,17 @@ if __name__ == "__main__":
     )
 
     country = snakemake.config["country"]
-    
+
     n = pypsa.Network()
 
     n.snapshots = pd.date_range(**snakemake.config["snapshots"])
 
     n.snapshot_weightings.loc[:, :] = float(snakemake.config["snapshots"]["freq"][:-1])
 
-    freq = snakemake.config["snapshots"]["freq"]
-    years = (n.snapshots[-1] - n.snapshots[0] + pd.Timedelta(freq)) / np.timedelta64(1,'Y')
+    years = snakemake.config["number_years"]
+    if not years:
+        freq = snakemake.config["snapshots"]["freq"]
+        years = (n.snapshots[-1] - n.snapshots[0] + pd.Timedelta(freq)) / np.timedelta64(1,'Y')
 
     tech_data = load_technology_data(
         snakemake.input.tech_data,
