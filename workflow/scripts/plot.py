@@ -1,9 +1,28 @@
+from datetime import datetime
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import pypsa
 from helpers import set_scenario_config
 from pypsa.descriptors import get_switchable_as_dense as as_dense
+
+
+def set_xticks(ax, index):
+    major_tick_positions = [index.get_loc(date) for date in index if date == datetime(date.year, 1, 1, 0)]
+    formatter = "%b\n%Y" if len(major_tick_positions) <= 8 else "'%y"
+    major_labels = [date.strftime(formatter) for date in index if date == datetime(date.year, 1, 1, 0)]
+    ax.set_xticks(major_tick_positions)
+    ax.set_xticklabels(major_labels)
+
+    if len(major_tick_positions) <= 3:
+        months = range(1, 13) if len(major_tick_positions) <= 2 else [1, 4, 7, 10]
+        minor_tick_positions = [index.get_loc(date) for date in index if date.month in months and date.day == 1 and date.hour == 0]
+        minor_labels = [date.strftime("%b") for date in index if  date.month in months and date.day == 1 and date.hour == 0]
+        ax.set_xticks(minor_tick_positions, minor=True)
+        ax.set_xticklabels(minor_labels, minor=True)
+
+        ax.tick_params(axis="x", which="minor", labelcolor="grey")
 
 
 def get_hydrogen_bids(n, sns=None):
@@ -59,6 +78,8 @@ def plot_price_duration(n):
 def plot_price_time_series(n):
     df = n.buses_t.marginal_price["electricity"]
 
+    df.reset_index(drop=True, inplace=True)
+
     fig, ax = plt.subplots()
 
     df.plot(
@@ -67,6 +88,10 @@ def plot_price_time_series(n):
         xlabel="Snapshots",
         ylim=(0, df.max() * 1.1),
     )
+
+    ax.set_xlim(df.index[0], df.index[-1])
+
+    set_xticks(ax, n.snapshots)
 
     plt.savefig(snakemake.output.price_time_series)
 
@@ -79,6 +104,8 @@ def plot_mu_energy_balance(n):
         plt.savefig(snakemake.output.mu_energy_balance)
         return
 
+    df.reset_index(drop=True, inplace=True)
+
     fig, ax = plt.subplots()
 
     df.plot(
@@ -87,6 +114,10 @@ def plot_mu_energy_balance(n):
         xlabel="Snapshots",
         ylim=(0, df.max().max() * 1.1),
     )
+
+    set_xticks(ax, n.snapshots)
+
+    plt.xlim(df.index[0], df.index[-1])
 
     plt.savefig(snakemake.output.mu_energy_balance)
 
@@ -98,6 +129,9 @@ def plot_hydrogen_bidding(n):
         return
 
     electrolyser_bid, fuel_cell_bid = get_hydrogen_bids(n)
+
+    electrolyser_bid.reset_index(drop=True, inplace=True)
+    fuel_cell_bid.reset_index(drop=True, inplace=True)
 
     fig, ax = plt.subplots()
 
@@ -116,6 +150,10 @@ def plot_hydrogen_bidding(n):
         label="hydrogen fuel cell",
     )
 
+    set_xticks(ax, n.snapshots)
+    
+    plt.xlim(electrolyser_bid.index[0], electrolyser_bid.index[-1])
+
     plt.savefig(snakemake.output.hydrogen_bidding)
 
 
@@ -126,6 +164,9 @@ def plot_battery_bidding(n):
         return
 
     charger_bid, discharger_bid = get_battery_bids(n)
+
+    charger_bid.reset_index(drop=True, inplace=True)
+    discharger_bid.reset_index(drop=True, inplace=True)
 
     fig, ax = plt.subplots()
 
@@ -144,6 +185,10 @@ def plot_battery_bidding(n):
         label="battery discharger",
     )
 
+    set_xticks(ax, n.snapshots)
+
+    plt.xlim(charger_bid.index[0], charger_bid.index[-1])
+
     plt.savefig(snakemake.output.battery_bidding)
 
 
@@ -161,7 +206,7 @@ def plot_energy_balance(n):
         .groupby("carrier")
         .sum()
         .drop(0, axis=1)
-        .drop("load", axis=0, errors="ignore")
+        .drop(["load", "load-shedding"], axis=0, errors="ignore")
         .T
     )
     crt.columns += " curtailed"
@@ -175,6 +220,8 @@ def plot_energy_balance(n):
     )
     eb = eb[order]
 
+    eb.reset_index(drop=True, inplace=True)
+
     fig, ax = plt.subplots()
 
     eb.plot.area(
@@ -185,7 +232,11 @@ def plot_energy_balance(n):
         color=eb.columns.map(n.carriers.color),
     )
 
+    set_xticks(ax, n.snapshots)
+
     plt.legend(bbox_to_anchor=(1, 1))
+
+    plt.xlim(eb.index[0], eb.index[-1])
 
     plt.savefig(snakemake.output.energy_balance)
 
@@ -309,7 +360,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("plot", lt="inelastic+true")
+        snakemake = mock_snakemake("plot", lt="country+DE-number_years+2-inelastic+true")
         # snakemake = mock_snakemake("plot_myopic_dispatch", lt="inelastic+true", st="horizon+96")
 
     set_scenario_config(
