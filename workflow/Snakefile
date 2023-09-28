@@ -66,6 +66,7 @@ rule plot:
         **rules.solve.output
     output:
         price_duration=RESULTS + "graphics/LT-{lt}/price_duration.pdf",
+        load_duration=RESULTS + "graphics/LT-{lt}/load_duration.pdf",
         price_time_series=RESULTS + "graphics/LT-{lt}/price_time_series.pdf",
         mu_energy_balance=RESULTS + "graphics/LT-{lt}/mu_energy_balance.pdf",
         energy_balance=RESULTS + "graphics/LT-{lt}/energy_balance.pdf",
@@ -103,6 +104,7 @@ rule plot_myopic_dispatch:
         **rules.solve_myopic_dispatch.output
     output:
         price_duration=RESULTS + "graphics/LT-{lt}/ST-{st}/price_duration.pdf",
+        load_duration=RESULTS + "graphics/LT-{lt}/ST-{st}/load_duration.pdf",
         price_time_series=RESULTS + "graphics/LT-{lt}/ST-{st}/price_time_series.pdf",
         mu_energy_balance=RESULTS + "graphics/LT-{lt}/ST-{st}/mu_energy_balance.pdf",
         energy_balance=RESULTS + "graphics/LT-{lt}/ST-{st}/energy_balance.pdf",

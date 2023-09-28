@@ -82,6 +82,20 @@ def get_price_duration(n, bus="electricity"):
     return df
 
 
+def get_load_duration(n):
+ 
+    df = (
+        n.statistics.energy_balance(aggregate_time=False)
+        .xs("load", axis=0, level='carrier')
+        .sum()
+        .mul(-1)
+        .sort_values(ascending=False)
+        .reset_index(drop=True)
+    )
+    df.index = np.arange(0, 100, 100 / len(df.index))
+    return df
+
+
 def plot_price_duration(n):
     df = get_price_duration(n)
 
@@ -97,6 +111,22 @@ def plot_price_duration(n):
 
     plt.savefig(snakemake.output.price_duration)
 
+
+def plot_load_duration(n):
+
+    df = get_load_duration(n)
+
+    fig, ax = plt.subplots()
+    
+    df.plot(
+        ax=ax,
+        ylim=(0, df.max() * 1.1),
+        xlim=(0, 100),
+        ylabel="Electricity Demand [MW]",
+        xlabel="Fraction of Time [%]",
+    )
+
+    plt.savefig(snakemake.output.load_duration)
 
 def plot_price_time_series(n):
     df = n.buses_t.marginal_price["electricity"]
@@ -422,6 +452,8 @@ if __name__ == "__main__":
     n.madd("Carrier", colors.keys(), color=colors.values())
 
     plot_price_duration(n)
+
+    plot_load_duration(n)
 
     plot_price_time_series(n)
 
