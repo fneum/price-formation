@@ -7,6 +7,12 @@ HTTP = HTTPRemoteProvider()
 
 configfile: "config/config.yaml"
 
+localrules:
+    download_technology_data,
+    clean,
+    send,
+    receive,
+
 wildcard_constraints:
     lt="[^/]+" # cannot include folder separators
 
