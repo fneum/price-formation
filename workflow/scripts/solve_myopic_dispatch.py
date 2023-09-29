@@ -36,30 +36,32 @@ if __name__ == "__main__":
     fix_optimal_capacities_from_other(n, n_solved)
 
     hydrogen_bid = snakemake.config["myopic"]["hydrogen_bid"]
-    if hydrogen_bid == "series":
-        # this only works if long-term and short-term model share same snapshots
-        n.stores_t.marginal_cost["hydrogen storage"] = n_solved.buses_t.marginal_price[
-            "hydrogen"
-        ]
-    elif hydrogen_bid == "mean":
-        n.stores.at["hydrogen storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
-            "hydrogen"
-        ].mean()
-    elif isinstance(hydrogen_bid, (float, int)):
-        n.stores.at["hydrogen storage", "marginal_cost"] = hydrogen_bid
+    if "hydrogen storage" not in n.stores.index:
+        if hydrogen_bid == "series":
+            # this only works if long-term and short-term model share same snapshots
+            n.stores_t.marginal_cost["hydrogen storage"] = n_solved.buses_t.marginal_price[
+                "hydrogen"
+            ]
+        elif hydrogen_bid == "mean":
+            n.stores.at["hydrogen storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
+                "hydrogen"
+            ].mean()
+        elif isinstance(hydrogen_bid, (float, int)):
+            n.stores.at["hydrogen storage", "marginal_cost"] = hydrogen_bid
 
     battery_bid = snakemake.config["myopic"]["battery_bid"]
-    if battery_bid == "series":
-        # this only works if long-term and short-term model share same snapshots
-        n.stores_t.marginal_cost["battery storage"] = n_solved.buses_t.marginal_price[
-            "battery"
-        ]
-    elif battery_bid == "mean":
-        n.stores.at["battery storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
-            "battery"
-        ].mean()
-    elif isinstance(battery_bid, (float, int)):
-        n.stores.at["battery storage", "marginal_cost"] = battery_bid
+    if "battery storage" in n.stores.index:
+        if battery_bid == "series":
+            # this only works if long-term and short-term model share same snapshots
+            n.stores_t.marginal_cost["battery storage"] = n_solved.buses_t.marginal_price[
+                "battery"
+            ]
+        elif battery_bid == "mean":
+            n.stores.at["battery storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
+                "battery"
+            ].mean()
+        elif isinstance(battery_bid, (float, int)):
+            n.stores.at["battery storage", "marginal_cost"] = battery_bid
 
     n.stores.e_cyclic = snakemake.config["myopic"]["cyclic"]
 
