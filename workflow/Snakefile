@@ -54,6 +54,7 @@ rule solve:
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
     threads: 4
+    benchmark: RESULTS + "benchmarks/LT-{lt}.log"
     conda:
         "envs/environment.yaml"
     script:
@@ -93,6 +94,7 @@ rule solve_myopic_dispatch:
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
     threads: 4
+    benchmark: RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
     conda:
         "envs/environment.yaml"
     script:
