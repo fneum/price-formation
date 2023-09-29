@@ -76,6 +76,8 @@ rule plot:
         cost_recovery=RESULTS + "graphics/LT-{lt}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/soc.pdf",
         **{sns: RESULTS + "graphics/LT-{lt}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+    resources:
+        mem_mb=8000,
     conda:
         "envs/environment.yaml"
     script:
@@ -116,6 +118,8 @@ rule plot_myopic_dispatch:
         cost_recovery=RESULTS + "graphics/LT-{lt}/ST-{st}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/ST-{st}/soc.pdf",
         **{sns: RESULTS + "graphics/LT-{lt}/ST-{st}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
+    resources:
+        mem_mb=8000,
     conda:
         "envs/environment.yaml"
     script:
