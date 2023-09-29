@@ -50,7 +50,7 @@ def get_battery_bids(n, sns=None):
     return charger_bid, discharger_bid
 
 
-def get_cost_recovery(n):
+def get_cost_recovery(n, segments='pricebands'):
     # remove artificial bids from myopic dispatch optimisation
     carriers = n.stores.index.intersection(["hydrogen storage", "battery storage"])
     n.stores.loc[carriers, "marginal_cost"] = 0.
@@ -61,9 +61,15 @@ def get_cost_recovery(n):
         return s
     comps = {"Generator", "Link", "Store"}
     revenue = n.statistics.revenue(comps=comps, aggregate_time=False).droplevel(0).drop('load', errors='ignore').groupby(merge_battery).sum().div(1e6)
-    revenue = revenue.groupby(revenue.columns.month, axis=1).sum()
 
-    revenue.columns = revenue.columns.map(calendar.month_abbr.__getitem__)
+    if segments == 'months':
+        revenue = revenue.groupby(revenue.columns.month, axis=1).sum()
+        revenue.columns = revenue.columns.map(calendar.month_abbr.__getitem__)
+    elif segments == 'pricebands':
+        lmps = n.buses_t.marginal_price["electricity"]
+        bins = [0, 10, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
+        bins = [v for v in bins if v < max(lmps)] + [max(lmps) + 1]
+        revenue = revenue.groupby(pd.cut(lmps, bins=bins, precision=0), axis=1).sum()
 
     costs = (n.statistics.opex() + n.statistics.capex()).droplevel(0).drop('load', errors='ignore').groupby(merge_battery).sum().div(1e6)
 
@@ -440,13 +446,33 @@ def plot_supply_demand_curve(n, sns):
     plt.savefig(snakemake.output[sns])
 
 
-def plot_cost_recovery(n):
+def plot_cost_recovery(n, segments='pricebands'):
 
-    crf = get_cost_recovery(n)
+    crf = get_cost_recovery(n, segments)
+
+    preferred_order = pd.Index([
+        "hydrogen storage",
+        "battery storage",
+        "hydrogen electrolyser",
+        "hydrogen fuel cell",
+        "battery dis-/charging",
+        "solar",
+        "wind",
+        "total",
+    ])
+
+    order = preferred_order.intersection(crf.index).append(
+        crf.index.difference(preferred_order)
+    )
+    crf = crf.loc[order]
 
     fig, ax = plt.subplots(figsize=(8, 3))
 
     crf_sum = crf.sum(axis=1)
+
+    # to separate total
+    ax.axhline(6.5, linestyle="--", color="gray", linewidth=0.5)
+    ax.axhline(1.5, linestyle="--", color="gray", linewidth=0.5)
 
     ax.scatter(crf_sum, crf_sum.index, linewidth=0, marker=".", color='k', label='cost recovery', zorder=2)
     crf.plot.barh(ax=ax, stacked=True, cmap='viridis')
@@ -457,7 +483,7 @@ def plot_cost_recovery(n):
     for name, value in enumerate(crf_sum):
         ax.annotate(f"{value:.1f}%", (value, name), va="center", textcoords="offset points", xytext=(5, 0))
 
-    plt.legend(loc=(-0.08, 1.04), ncol=7)
+    plt.legend(bbox_to_anchor=(1.05, 1), title="price band [€/MWh]", reverse=True)
 
     plt.savefig(snakemake.output.cost_recovery)
 
@@ -466,7 +492,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("plot", lt="country+DE-number_years+2-inelastic+true")
+        snakemake = mock_snakemake("plot", lt="country+DE-elastic+true")
         # snakemake = mock_snakemake("plot_myopic_dispatch", lt="inelastic+true", st="horizon+96")
 
     set_scenario_config(
@@ -481,6 +507,8 @@ if __name__ == "__main__":
     colors = snakemake.config["colors"]
     n.mremove("Carrier", n.carriers.index)
     n.madd("Carrier", colors.keys(), color=colors.values())
+
+    plot_cost_recovery(n, "pricebands")
 
     plot_price_duration(n)
 
@@ -497,8 +525,6 @@ if __name__ == "__main__":
     plot_battery_bidding(n)
 
     plot_energy_balance(n)
-
-    plot_cost_recovery(n)
 
     for sns in snakemake.config["supply_demand_curve"]["snapshots"]:
         plot_supply_demand_curve(n, sns)
