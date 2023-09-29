@@ -55,7 +55,6 @@ rule solve:
         network=RESULTS + "network_prepared_LT-{lt}.nc",
     output:
         network=RESULTS + "network_solved_LT-{lt}.nc",
-        energy_balance=RESULTS + "summary/LT-{lt}/energy_balance.csv",
         statistics=RESULTS + "summary/LT-{lt}/statistics.csv",
     resources: 
         mem_mb=config["solver"]["mem_mb"],
@@ -97,7 +96,6 @@ rule solve_myopic_dispatch:
         solved_network=RESULTS + "network_solved_LT-{lt}.nc",
     output:
         network=RESULTS + "network_myopic_LT-{lt}_ST-{st}.nc",
-        energy_balance=RESULTS + "summary/LT-{lt}/ST-{st}/energy_balance.csv",
         statistics=RESULTS + "summary/LT-{lt}/ST-{st}/statistics.csv",
     resources:
         mem_mb=config["solver"]["mem_mb"],

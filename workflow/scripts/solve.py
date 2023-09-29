@@ -94,7 +94,4 @@ if __name__ == "__main__":
     export_kwargs = snakemake.config["export_to_netcdf"]
     n.export_to_netcdf(snakemake.output.network, **export_kwargs)
 
-    energy_balance = n.statistics.energy_balance(aggregate_time=False, aggregate_bus=False).T
-    energy_balance.to_csv(snakemake.output.energy_balance)
-
     n.statistics().to_csv(snakemake.output.statistics)
