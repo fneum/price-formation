@@ -26,6 +26,29 @@ def set_xticks(ax, index):
         ax.tick_params(axis="x", which="minor", labelcolor="grey")
 
 
+def get_energy_balance(n):
+    eb = (
+        n.statistics.energy_balance(aggregate_time=False)
+        .xs("electricity", level="bus_carrier")
+        .groupby("carrier")
+        .sum()
+        .T
+    )
+
+    crt = (
+        n.statistics.curtailment(aggregate_time=False)
+        .groupby("carrier")
+        .sum()
+        .drop(0, axis=1)
+        .drop(["load", "load-shedding"], axis=0, errors="ignore")
+        .T
+    )
+    crt.columns += " curtailed"
+    crt.index = pd.DatetimeIndex(crt.index)
+
+    return pd.concat([eb, crt], axis=1)
+
+
 def get_hydrogen_bids(n, sns=None):
     mcp = n.buses_t.marginal_price["hydrogen"]
     if sns:
@@ -280,26 +303,13 @@ def plot_battery_bidding(n):
 
 
 def plot_energy_balance(n):
-    eb = (
-        n.statistics.energy_balance(aggregate_time=False)
-        .xs("electricity", level="bus_carrier")
-        .groupby("carrier")
-        .sum()
-        .T
-    )
 
-    crt = (
-        n.statistics.curtailment(aggregate_time=False)
-        .groupby("carrier")
-        .sum()
-        .drop(0, axis=1)
-        .drop(["load", "load-shedding"], axis=0, errors="ignore")
-        .T
-    )
-    crt.columns += " curtailed"
-    crt.index = pd.DatetimeIndex(crt.index)
+    if len(n.snapshots) > 8784 * 5:
+        fig, ax = plt.subplots()
+        plt.savefig(snakemake.output.energy_balance)
+        return
 
-    eb = pd.concat([eb, crt], axis=1)
+    eb = get_energy_balance(n)
 
     preferred_order = pd.Index(snakemake.config["preferred_order"])
     order = preferred_order.intersection(eb.columns).append(
