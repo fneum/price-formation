@@ -144,6 +144,7 @@ colors:
   hydrogen storage: "#9723dc"
   electricity: "#7eae51"
   load: "#7eae51"
+  load-shedding: "#bac7ad"
 
 preferred_order:
   - load
@@ -153,6 +154,7 @@ preferred_order:
   - solar
   - hydrogen fuel cell
   - battery discharger
+  - load-shedding
   - wind curtailed
   - solar curtailed
 
