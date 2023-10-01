@@ -83,6 +83,17 @@ solver_options:
     PreDual: 0
     GURO_PAR_BARDENSETHRESH: 200
     seed: 10
+  highs-default:
+    threads: 4
+    solver: "ipm"
+    run_crossover: "off"
+    small_matrix_value: 1e-6
+    large_matrix_value: 1e9
+    primal_feasibility_tolerance: 1e-6
+    dual_feasibility_tolerance: 1e-6
+    ipm_optimality_tolerance: 1e-5
+    parallel: "on"
+    random_seed: 123
 
 myopic:
   horizon: 72
