@@ -49,6 +49,8 @@ rule prepare:
     script:
         "scripts/prepare.py"
 
+def get_attempt(wildcards, attempt):
+    return attempt
 
 rule solve:
     input:
@@ -59,7 +61,9 @@ rule solve:
     resources: 
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
+        attempt=get_attempt,
     threads: 4
+    retries: 1
     benchmark: RESULTS + "benchmarks/LT-{lt}.log"
     conda:
         "envs/environment.yaml"

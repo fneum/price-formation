@@ -52,20 +52,28 @@ def add_battery_constraints(n, sns):
     n.model.add_constraints(lhs == 0, name="Link-charger_ratio")
 
 
-def solve_network(n, config):
+def solve_network(n, config, attempt=1):
+
+    solver_name = config["solver"]["name"]
     profile = config["solver"]["options"]
+    solver_options = config["solver_options"][profile]
+
+    if attempt > 1 and solver_name == "gurobi":
+        numeric_profile = "gurobi-numeric"
+        logger.info(f"Retry with {numeric_profile} solver settings.")
+        solver_options.update(config["solver_options"][numeric_profile])
 
     status, condition = n.optimize(
-        solver_name=config["solver"]["name"],
-        solver_options=config["solver_options"][profile],
+        solver_name=solver_name,
+        solver_options=solver_options,
         assign_all_duals=True,
         extra_functionality=add_battery_constraints
     )
 
     if status != "ok":
         logger.info(f"Solving status '{status}' with condition '{condition}'")
-    if "infeasible" in condition:
-        raise RuntimeError("Solving status 'infeasible'")
+    if condition in ["infeasible", "suboptimal", "unbounded", "error"]:
+        raise RuntimeError(f"Solving status '{condition}'")
 
 
 if __name__ == "__main__":
@@ -87,7 +95,7 @@ if __name__ == "__main__":
         snakemake.config["random_years"],
     )
 
-    solve_network(n, snakemake.config)
+    solve_network(n, snakemake.config, snakemake.resources.attempt)
 
     n.meta = snakemake.config
 

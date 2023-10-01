@@ -54,10 +54,12 @@ technology_data:
     discount rate: 0.07
 
 snapshots:
-  start: "1950-01-01"
+  start: "2020-01-01"
   end: "2021-01-01"
   inclusive: left
   freq: 1H
+
+clip_p_max_pu: 1.e-2
 
 cluster-sync:
     url: zecm
@@ -89,6 +91,13 @@ solver_options:
     PreDual: 0
     GURO_PAR_BARDENSETHRESH: 200
     seed: 10
+  gurobi-numeric:
+    BarHomogeneous: 1
+    # NumericFocus: 1
+    Presolve: 0
+    Aggregate: 0
+    Quad: 1
+    MarkowitzTol: 0.2
   highs-default:
     threads: 4
     solver: "ipm"
