@@ -26,8 +26,8 @@ if __name__ == "__main__":
         snakemake.wildcards,
     )
 
-    solver_name = snakemake.config["solver"]["name"]
-    profile = snakemake.config["solver"]["options"]
+    solver_name = snakemake.config["myopic_solver"]["name"]
+    profile = snakemake.config["myopic_solver"]["options"]
     solver_options = snakemake.config["solver_options"][profile]
 
     n = pypsa.Network(snakemake.input.prepared_network)

@@ -69,7 +69,13 @@ cluster-sync:
 solver:
   name: gurobi
   options: gurobi-default
-  mem_mb: 16000
+  mem_mb: 24000
+  walltime: "24:00:00"
+
+myopic_solver:
+  name: highs
+  options: highs-default
+  mem_mb: 24000
   walltime: "24:00:00"
 
 solver_options:
