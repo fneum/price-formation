@@ -82,6 +82,9 @@ if __name__ == "__main__":
 
         snakemake = mock_snakemake("solve", lt='inelastic+true')
 
+    # if snakemake.resources.attempt == 1:
+    #     raise ValueError("Purposefully fail first attempt for testing.")
+
     set_scenario_config(
         snakemake.config,
         snakemake.wildcards,
