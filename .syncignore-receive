@@ -9,7 +9,20 @@ __pycache__
 *.pyc
 *.pyo
 gurobi.log
+report.html
 
 # project specific
 
 researchdata.reading.ac.uk
+workflow
+
+*.nc
+
+ARCHIVE*
+notes
+report
+config/scenarios.yaml
+logs
+
+*energy_balance.pdf
+*energy_balance.csv
