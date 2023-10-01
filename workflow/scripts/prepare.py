@@ -30,7 +30,7 @@ def load_technology_data(fn, defaults, years=1):
     return df
 
 
-def load_time_series(fn, country, snapshots):
+def load_time_series(fn, country, snapshots, clip_p_max_pu=1e-2):
     snapshots = pd.date_range("1950-01-01", "2021-01-01", inclusive="left", freq="H")
 
     ds = xr.open_dataset(fn)
@@ -38,6 +38,8 @@ def load_time_series(fn, country, snapshots):
     ds = ds.assign_coords(NUTS=ds["NUTS_keys"], time=snapshots)
 
     s = ds.timeseries_data.sel(NUTS=country, time=snapshots).to_pandas()
+
+    s.where(s > clip_p_max_pu, other=0.0, inplace=True)
 
     return s
 
