@@ -226,8 +226,9 @@ if __name__ == "__main__":
         years,
     )
 
-    solar_cf = load_time_series(snakemake.input.solar_cf, country, n.snapshots)
-    onwind_cf = load_time_series(snakemake.input.onwind_cf, country, n.snapshots)
+    clip_p_max_pu = snakemake.config["clip_p_max_pu"]
+    solar_cf = load_time_series(snakemake.input.solar_cf, country, n.snapshots, clip_p_max_pu)
+    onwind_cf = load_time_series(snakemake.input.onwind_cf, country, n.snapshots, clip_p_max_pu)
 
     n.add("Bus", "electricity", carrier="electricity")
 
