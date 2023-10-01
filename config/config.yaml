@@ -119,7 +119,7 @@ myopic:
   hydrogen_bid: "mean" # or 'mean' or float
   perturbation: 1 # pattern: <carrier: factor>
   number_years: false
-  random_years: false
+  random_years: true
 
 export_to_netcdf:
   float32: true
