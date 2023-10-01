@@ -75,14 +75,14 @@ solver:
   walltime: "24:00:00"
 
 myopic_solver:
-  name: highs
-  options: highs-default
+  name: gurobi # highs
+  options: gurobi-default # highs-default
   mem_mb: 24000
   walltime: "24:00:00"
 
 solver_options:
   gurobi-default:
-    threads: 4
+    threads: 8
     method: 2 # barrier
     crossover: 0
     BarConvTol: 1.e-8
@@ -103,10 +103,10 @@ solver_options:
     solver: "ipm"
     run_crossover: "off"
     small_matrix_value: 1e-6
-    large_matrix_value: 1e9
+    large_matrix_value: 1e10
     primal_feasibility_tolerance: 1e-6
     dual_feasibility_tolerance: 1e-6
-    ipm_optimality_tolerance: 1e-5
+    ipm_optimality_tolerance: 1e-8
     parallel: "on"
     random_seed: 123
 
