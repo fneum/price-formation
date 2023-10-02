@@ -85,6 +85,7 @@ rule plot:
         battery_bidding=RESULTS + "graphics/LT-{lt}/battery_bidding.pdf",
         cost_recovery=RESULTS + "graphics/LT-{lt}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/soc.pdf",
+        metrics=RESULTS + "summary/LT-{lt}/metrics.csv",
         **{sns: RESULTS + "graphics/LT-{lt}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     resources:
         mem_mb=8000,
@@ -127,6 +128,7 @@ rule plot_myopic_dispatch:
         battery_bidding=RESULTS + "graphics/LT-{lt}/ST-{st}/battery_bidding.pdf",
         cost_recovery=RESULTS + "graphics/LT-{lt}/ST-{st}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/ST-{st}/soc.pdf",
+        metrics=RESULTS + "summary/LT-{lt}/ST-{st}/metrics.csv",
         **{sns: RESULTS + "graphics/LT-{lt}/ST-{st}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     resources:
         mem_mb=8000,

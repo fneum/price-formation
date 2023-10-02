@@ -498,6 +498,55 @@ def plot_cost_recovery(n, segments='pricebands'):
     plt.savefig(snakemake.output.cost_recovery)
 
 
+def get_metrics(n):
+
+    energy_balance = n.statistics.energy_balance().groupby("carrier").sum()
+
+    weightings = n.snapshot_weightings.generators
+
+    metrics = pd.Series()
+    metrics["opex"] = n.statistics.opex().drop("load", level=1, errors='ignore').sum()
+    metrics["capex"] = n.statistics.capex().sum()
+    metrics["system-costs"] = metrics["capex"] + metrics["opex"]
+    metrics["energy-served"] = -energy_balance["load"]
+    metrics["average-load-served"] = -energy_balance["load"] / weightings.sum()
+    metrics["primary-energy"] = energy_balance["wind"] + energy_balance["solar"]
+    metrics["wind-share"] = energy_balance["wind"] / metrics["primary-energy"]
+    metrics["solar-share"] = energy_balance["solar"] / metrics["primary-energy"]
+
+    market_values = n.statistics.market_value()
+    metrics["wind-lcoe"] = market_values.loc["Generator", "wind"]
+    metrics["solar-lcoe"] = market_values.loc["Generator", "solar"]
+
+    curtailment_mwh = n.statistics.curtailment().sum()
+    metrics["curtailment"] = curtailment_mwh / (curtailment_mwh + metrics["primary-energy"])
+
+    # multiple if statements since mixing of voll and elastic is possible
+    U = 0.
+    if n.meta["elastic"]:
+        a = n.meta["elastic_intercept"]
+        b = n.meta["elastic_intercept"] / n.meta["load"]
+        constant = a ** 2 / (2 * b) * weightings.sum()
+        Q2 = n.generators_t.p["load-shedding"] ** 2
+        U += constant - b / 2 * Q2 @ weightings
+    if n.meta["voll"]:
+        Q = -n.generators_t.p["load"]
+        U += n.meta["voll_price"] * Q @ weightings
+    if n.meta["inelastic"]:
+        U = pd.NA
+
+    metrics["utility"] = U
+
+    metrics["welfare"] = metrics["utility"] - metrics["system-costs"]
+
+    metrics["average-costs"] = metrics["system-costs"] / metrics["energy-served"]
+
+    crf = get_cost_recovery(n).sum(axis=1).rename(index=lambda x: "cost-recovery " + x)
+    metrics = pd.concat([metrics, crf])
+
+    metrics.to_csv(snakemake.output.metrics)
+
+
 if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
@@ -517,6 +566,8 @@ if __name__ == "__main__":
     colors = snakemake.config["colors"]
     n.mremove("Carrier", n.carriers.index)
     n.madd("Carrier", colors.keys(), color=colors.values())
+
+    get_metrics(n)
 
     plot_cost_recovery(n, "pricebands")
 
