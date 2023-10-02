@@ -1,3 +1,4 @@
+import contextlib
 import logging
 
 import pypsa
@@ -93,13 +94,22 @@ if __name__ == "__main__":
             assign_all_duals=True,
         )
     else:
-        n.optimize.optimize_with_rolling_horizon(
-            solver_name=solver_name,
-            solver_options=solver_options,
-            assign_all_duals=True,
-            horizon=snakemake.config["myopic"]["horizon"],
-            overlap=snakemake.config["myopic"]["overlap"],
-        )
+        with contextlib.ExitStack() as stack:
+
+            if solver_name == 'gurobi':
+                import gurobipy
+                env = stack.enter_context(gurobipy.Env())
+            else:
+                env = None
+
+            n.optimize.optimize_with_rolling_horizon(
+                solver_name=solver_name,
+                solver_options=solver_options,
+                assign_all_duals=True,
+                horizon=snakemake.config["myopic"]["horizon"],
+                overlap=snakemake.config["myopic"]["overlap"],
+                env=env,
+            )
 
     export_kwargs = snakemake.config["export_to_netcdf"]
     n.export_to_netcdf(snakemake.output.network, **export_kwargs)
