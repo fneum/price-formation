@@ -37,7 +37,7 @@ if __name__ == "__main__":
     fix_optimal_capacities_from_other(n, n_solved)
 
     hydrogen_bid = snakemake.config["myopic"]["hydrogen_bid"]
-    if "hydrogen storage" not in n.stores.index:
+    if "hydrogen storage" in n.stores.index:
         if hydrogen_bid == "series":
             # this only works if long-term and short-term model share same snapshots
             n.stores_t.marginal_cost["hydrogen storage"] = n_solved.buses_t.marginal_price[
