@@ -10,6 +10,13 @@
 *.fdb_latexmk
 *.synctex.gz
 *.fls
+*-blx.bib
+*.nav
+*.bcf
+*.run.xml
+*.snm
+*.synctex(busy)
+*.sty
 old/*
 
 *.docx*
@@ -30,3 +37,7 @@ results
 workflow/scripts/code_snippets.py
 
 ARCHIVE
+
+data
+
+config/config.*.yaml

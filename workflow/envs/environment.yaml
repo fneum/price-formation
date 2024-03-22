@@ -23,6 +23,7 @@ dependencies:
 - ipython
 - gurobi
 - ipykernel
+- seaborn
 
 - pip:
   - highspy

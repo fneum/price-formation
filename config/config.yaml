@@ -1,22 +1,13 @@
-run: "default"
+run: "single"
 
 scenario:
   lt:
-  - country+DE-number_years+1-inelastic+true
-  - country+DE-number_years+1-elastic+true-elastic_intercept+200
-  - country+DE-number_years+1-elastic+true-elastic_intercept+2000
-  - country+DE-number_years+1-elastic+true-elastic_intercept+20000
-  - country+ES-number_years+1-inelastic+true
-  - country+ES-number_years+1-elastic+true-elastic_intercept+200
-  - country+ES-number_years+1-elastic+true-elastic_intercept+2000
-  - country+ES-number_years+1-elastic+true-elastic_intercept+20000
+  - country+DE-elastic+true
+  - country+DE-voll+true
+  # - country+DE-inelastic+true
   st:
-  - number_years+1-horizon+96-overlap+24
-  - number_years+1-horizon+96-overlap+24-perturbation+0.99
-  - number_years+1-horizon+96-overlap+24-perturbation+1.01
-  - number_years+1-horizon+72-overlap+24
-  - number_years+1-horizon+48-overlap+24
-  - number_years+1-perfect_foresight+true
+  - horizon+168-overlap+0
+  - perfect_foresight+true-cyclic+true
 
 country: DE
 
@@ -82,7 +73,7 @@ myopic_solver:
 
 solver_options:
   gurobi-default:
-    threads: 8
+    threads: 4
     method: 2 # barrier
     crossover: 0
     BarConvTol: 1.e-8

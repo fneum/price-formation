@@ -19,7 +19,7 @@ def set_snapshots(n, number_years=False, random_years=False, exclude_years=[]):
     all_years = set(n.snapshots.year.unique())
     allowed_years = list(all_years.difference(exclude_years))
 
-    assert len(allowed_years) > number_years, "Fewer allowed years than selected years"
+    assert len(allowed_years) >= number_years, "Fewer allowed years than selected years"
 
     if random_years:
         random.shuffle(allowed_years)
