@@ -1,0 +1,122 @@
+\documentclass[final,3p]{elsarticle}
+
+\bibliographystyle{elsarticle-num}
+\biboptions{sort&compress}
+
+\journal{Macro-Energy Systems Workshop 2024}
+
+\usepackage{libertine}
+\usepackage{libertinust1math}
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\graphicspath{{graphics/}, {../slides/graphics}}
+
+\DeclareGraphicsExtensions{.pdf,.jpeg,.png}
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage[normalem]{ulem}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{siunitx}
+% \usepackage[parfill]{parskip}
+
+\usepackage{url}
+\usepackage[colorlinks]{hyperref}
+\usepackage[sort&compress,noabbrev]{cleveref}
+
+\urlstyle{sf}
+\renewcommand{\ttdefault}{\sfdefault}
+
+\usepackage{eurosym}
+
+\def\co{CO${}_2$} \def\el{${}_{\textrm{el}}$} \def\th{${}_{\textrm{th}}$}
+\def\l{\lambda} \def\K{\kappa} \def\m{\mu} \def\G{\Gamma} \def\d{\partial}
+\def\cL{\mathcal{L}} \newcommand{\ubar}[1]{\text{\b{$#1$}}}
+
+
+\usepackage{fixltx2e}
+
+\hyphenation{net-works semi-conduc-tor under-represents over-representation}
+
+\makeatletter
+\long\def\MaketitleBox{%
+  \resetTitleCounters \def\baselinestretch{1}%
+   \def\baselinestretch{1}%
+    \noindent\Large\@title\par\vskip12pt \noindent\normalsize\elsauthors\par\vskip10pt
+    \noindent\footnotesize\itshape\elsaddress\par\vskip12pt }
+\makeatother
+
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Price Formation in 100\% Variable Renewable Electricity Systems:\\Demand Elasticity and Storage Bidding}
+\end{frontmatter}
+
+In long-term power system models that co-optimize asset capacity with dispatch,
+it is often cost-effective to invest in storage when shares of wind and solar
+are high. However, it is unclear how this storage should bid in real markets
+where only dispatch is optimized with limited operational foresight. In this
+work, we provide an answer by lifting storage constraints from the long-term
+model into the objective function using Lagrangian relaxation to create
+\textit{effective bids}. The shadow prices from constraints in the long-term
+model dictate the storage charging and discharging bids in the short-term model
+and reveal how prices form. Some of the mechanisms are known from the hydropower
+industry but are mostly concerned with dispatching single hydro-electric plants
+against price forecasts
+\cite{lederer1984overall,Pereira1989,Rotting1992,Fosso1999,CRAMPES2019100746}.
+
+We discuss the contention that electricity markets in 100\% variable renewable
+energy system models with no fuel costs become singular and politically
+challenging with many hours with prices close to 0~\euro/MWh and few hours with
+exceptionally high prices to recover investment costs
+\cite{mallapragadaElectricityPricing2023,jungePropertiesDeeply2022,levinEnergyStorage2023,taylorPowerSystems2015}.
+We show that this only results from assuming a perfectly inelastic demand and
+that the issue disappears with even a small amount of price elasticity.
+Additionally, the scarcity of generation results in new price levels reflecting
+the storage's willingness to pay or sell for charging/discharging.
+
+To illustrate bidding strategies and price formation mechanisms, we build a
+simple PyPSA \cite{PyPSA} capacity expansion model with a single node and no
+fuel costs, allowing the expansion of onshore wind and solar capacities with
+zero marginal cost, as well as battery and chemical storage systems with weather
+data for 71 years taken from \cite{rdgdr321}. We analyze cases with a perfectly
+inelastic demand of 100 MW, with load shedding at a VOLL of 2000 \euro/MWh, and
+inverse demand curves in similar magnitude in line with observed short-term
+price elasticities \cite{hirthHowAggregate2023,RePEc:zbw:esprep:272048}
+(\cref{fig:price-duration}). Furthermore, we show the effect of shortened
+operational foresight to four days and price formation for non-equilibrium
+capacities.
+
+We argue that the combined interaction of elastic demand willingness to pay and
+storage opportunity costs is enough to stabilize prices in systems with 100\%
+renewable supply, which largely recovers investment costs even with limited
+operational forecast skill and small perturbations to long-term equilibrium
+capacities. Hence, price duration curves from models with inelastic demand must
+be interpreted carefully.
+
+\vspace{1cm}
+
+\begin{figure}[!ht]
+	\centering
+	\footnotesize\sffamily
+	\includegraphics[width=0.49\textwidth]{pdc-3.pdf}
+	\includegraphics[width=0.49\textwidth]{ldc-3.pdf}
+	\caption{Price and load duration curves in long-term model for varying settings for price-elastic demand.}
+	\label{fig:price-duration}
+\end{figure}
+
+\newpage 
+{\normalsize
+\bibliography{storage_bidding}
+}
+
+\end{document}
