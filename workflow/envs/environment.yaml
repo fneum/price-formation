@@ -12,7 +12,7 @@ dependencies:
 - pip
 - pypsa==0.25.1
 - linopy>=0.2.6
-- snakemake-minimal<8
+- snakemake-minimal>=8.5
 - pandas
 - numpy
 - xarray
@@ -25,6 +25,8 @@ dependencies:
 - ipykernel
 - seaborn
 - pre-commit
+- snakemake-storage-plugin-http
+- snakemake-executor-plugin-cluster-generic
 
 - pip:
   - highspy

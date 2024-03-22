@@ -1,9 +1,9 @@
 from shutil import move, unpack_archive
 import yaml
 
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
+from snakemake.utils import min_version
 
-HTTP = HTTPRemoteProvider()
+min_version("8.5")
 
 configfile: "config/config.yaml"
 
@@ -20,7 +20,7 @@ RESULTS = "results/" + (config["run"] + "/" if config["run"] else "")
 
 rule download_weather_data:
     input:
-        HTTP.remote("https://researchdata.reading.ac.uk/321/4/ERA5_data_1950-2020.zip", keep_local=True, static=True)
+        storage("https://researchdata.reading.ac.uk/321/4/ERA5_data_1950-2020.zip", keep_local=True)
     output:
         protected(directory("resources/reading"))
     run:
