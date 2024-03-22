@@ -18,8 +18,7 @@ if __name__ == "__main__":
 
     df = pd.read_csv(
         f"https://raw.githubusercontent.com/PyPSA/technology-data/{version}/outputs/costs_{year}.csv",
-        index_col=0
+        index_col=0,
     )
 
     df.to_csv(snakemake.output.tech_data)
-

@@ -10,16 +10,30 @@ from pypsa.descriptors import get_switchable_as_dense as as_dense
 
 
 def set_xticks(ax, index):
-    major_tick_positions = [index.get_loc(date) for date in index if date == datetime(date.year, 1, 1, 0)]
+    major_tick_positions = [
+        index.get_loc(date) for date in index if date == datetime(date.year, 1, 1, 0)
+    ]
     formatter = "%b\n%Y" if len(major_tick_positions) <= 8 else "'%y"
-    major_labels = [date.strftime(formatter) for date in index if date == datetime(date.year, 1, 1, 0)]
+    major_labels = [
+        date.strftime(formatter)
+        for date in index
+        if date == datetime(date.year, 1, 1, 0)
+    ]
     ax.set_xticks(major_tick_positions)
     ax.set_xticklabels(major_labels)
 
     if len(major_tick_positions) <= 3:
         months = range(1, 13) if len(major_tick_positions) <= 2 else [1, 4, 7, 10]
-        minor_tick_positions = [index.get_loc(date) for date in index if date.month in months and date.day == 1 and date.hour == 0]
-        minor_labels = [date.strftime("%b") for date in index if  date.month in months and date.day == 1 and date.hour == 0]
+        minor_tick_positions = [
+            index.get_loc(date)
+            for date in index
+            if date.month in months and date.day == 1 and date.hour == 0
+        ]
+        minor_labels = [
+            date.strftime("%b")
+            for date in index
+            if date.month in months and date.day == 1 and date.hour == 0
+        ]
         ax.set_xticks(minor_tick_positions, minor=True)
         ax.set_xticklabels(minor_labels, minor=True)
 
@@ -73,33 +87,50 @@ def get_battery_bids(n, sns=None):
     return charger_bid, discharger_bid
 
 
-def get_cost_recovery(n, segments='pricebands'):
+def get_cost_recovery(n, segments="pricebands"):
     # remove artificial bids from myopic dispatch optimisation
     carriers = n.stores.index.intersection(["hydrogen storage", "battery storage"])
-    n.stores.loc[carriers, "marginal_cost"] = 0.
-    n.stores_t.marginal_cost.loc[:, carriers] = 0.
+    n.stores.loc[carriers, "marginal_cost"] = 0.0
+    n.stores_t.marginal_cost.loc[:, carriers] = 0.0
+
     def merge_battery(s):
         if "charger" in s:
             return "battery dis-/charging"
         return s
-    comps = {"Generator", "Link", "Store"}
-    revenue = n.statistics.revenue(comps=comps, aggregate_time=False).droplevel(0).drop('load', errors='ignore').groupby(merge_battery).sum().div(1e6)
 
-    if segments == 'months':
+    comps = {"Generator", "Link", "Store"}
+    revenue = (
+        n.statistics.revenue(comps=comps, aggregate_time=False)
+        .droplevel(0)
+        .drop("load", errors="ignore")
+        .groupby(merge_battery)
+        .sum()
+        .div(1e6)
+    )
+
+    if segments == "months":
         revenue = revenue.groupby(revenue.columns.month, axis=1).sum()
         revenue.columns = revenue.columns.map(calendar.month_abbr.__getitem__)
-    elif segments == 'pricebands':
+    elif segments == "pricebands":
         lmps = n.buses_t.marginal_price["electricity"]
         bins = [0, 10, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
         bins = [v for v in bins if v < max(lmps)] + [max(lmps) + 1]
         revenue = revenue.groupby(pd.cut(lmps, bins=bins, precision=0), axis=1).sum()
 
-    costs = (n.statistics.opex() + n.statistics.capex()).droplevel(0).drop('load', errors='ignore').groupby(merge_battery).sum().div(1e6)
+    costs = (
+        (n.statistics.opex() + n.statistics.capex())
+        .droplevel(0)
+        .drop("load", errors="ignore")
+        .groupby(merge_battery)
+        .sum()
+        .div(1e6)
+    )
 
     revenue.loc["total"] = revenue.sum()
     costs["total"] = costs.sum()
 
     return revenue.div(costs, axis=0) * 100
+
 
 def get_price_duration(n, bus="electricity"):
     df = (
@@ -112,10 +143,10 @@ def get_price_duration(n, bus="electricity"):
 
 
 def get_load_duration(n):
- 
+
     df = (
         n.statistics.energy_balance(aggregate_time=False)
-        .xs("load", axis=0, level='carrier')
+        .xs("load", axis=0, level="carrier")
         .sum()
         .mul(-1)
         .sort_values(ascending=False)
@@ -146,7 +177,7 @@ def plot_load_duration(n):
     df = get_load_duration(n)
 
     fig, ax = plt.subplots()
-    
+
     df.plot(
         ax=ax,
         ylim=(0, df.max() * 1.1),
@@ -156,6 +187,7 @@ def plot_load_duration(n):
     )
 
     plt.savefig(snakemake.output.load_duration)
+
 
 def plot_price_time_series(n):
     df = n.buses_t.marginal_price["electricity"]
@@ -220,7 +252,7 @@ def plot_state_of_charge(n):
         color=soc.columns.map(colors),
         ylabel="State of Charge [%]",
         xlabel="",
-        ylim=(0, 100)
+        ylim=(0, 100),
     )
 
     plt.legend(title="", bbox_to_anchor=(0.2, 1.02), ncol=2)
@@ -261,7 +293,7 @@ def plot_hydrogen_bidding(n):
     )
 
     set_xticks(ax, n.snapshots)
-    
+
     plt.xlim(electrolyser_bid.index[0], electrolyser_bid.index[-1])
 
     plt.savefig(snakemake.output.hydrogen_bidding)
@@ -320,7 +352,9 @@ def plot_energy_balance(n):
     eb.reset_index(drop=True, inplace=True)
 
     # protect against numerical inaccuracies (e.g. small negative values in positive column)
-    eb = eb.apply(lambda c: c.clip(lower=0) if (c >= 0).mean() > 0.5 else c.clip(upper=0))
+    eb = eb.apply(
+        lambda c: c.clip(lower=0) if (c >= 0).mean() > 0.5 else c.clip(upper=0)
+    )
 
     fig, ax = plt.subplots()
 
@@ -456,20 +490,22 @@ def plot_supply_demand_curve(n, sns):
     plt.savefig(snakemake.output[sns])
 
 
-def plot_cost_recovery(n, segments='pricebands'):
+def plot_cost_recovery(n, segments="pricebands"):
 
     crf = get_cost_recovery(n, segments)
 
-    preferred_order = pd.Index([
-        "hydrogen storage",
-        "battery storage",
-        "hydrogen electrolyser",
-        "hydrogen fuel cell",
-        "battery dis-/charging",
-        "solar",
-        "wind",
-        "total",
-    ])
+    preferred_order = pd.Index(
+        [
+            "hydrogen storage",
+            "battery storage",
+            "hydrogen electrolyser",
+            "hydrogen fuel cell",
+            "battery dis-/charging",
+            "solar",
+            "wind",
+            "total",
+        ]
+    )
 
     order = preferred_order.intersection(crf.index).append(
         crf.index.difference(preferred_order)
@@ -484,14 +520,28 @@ def plot_cost_recovery(n, segments='pricebands'):
     ax.axhline(6.5, linestyle="--", color="gray", linewidth=0.5)
     ax.axhline(1.5, linestyle="--", color="gray", linewidth=0.5)
 
-    ax.scatter(crf_sum, crf_sum.index, linewidth=0, marker=".", color='k', label='cost recovery', zorder=2)
-    crf.plot.barh(ax=ax, stacked=True, cmap='viridis')
+    ax.scatter(
+        crf_sum,
+        crf_sum.index,
+        linewidth=0,
+        marker=".",
+        color="k",
+        label="cost recovery",
+        zorder=2,
+    )
+    crf.plot.barh(ax=ax, stacked=True, cmap="viridis")
     plt.grid(axis="x")
     plt.ylabel("")
     plt.xlabel("cost recovery [%]")
 
     for name, value in enumerate(crf_sum):
-        ax.annotate(f"{value:.1f}%", (value, name), va="center", textcoords="offset points", xytext=(5, 0))
+        ax.annotate(
+            f"{value:.1f}%",
+            (value, name),
+            va="center",
+            textcoords="offset points",
+            xytext=(5, 0),
+        )
 
     plt.legend(bbox_to_anchor=(1.05, 1), title="price band [€/MWh]", reverse=True)
 
@@ -505,7 +555,7 @@ def get_metrics(n):
     weightings = n.snapshot_weightings.generators
 
     metrics = pd.Series()
-    metrics["opex"] = n.statistics.opex().drop("load", level=1, errors='ignore').sum()
+    metrics["opex"] = n.statistics.opex().drop("load", level=1, errors="ignore").sum()
     metrics["capex"] = n.statistics.capex().sum()
     metrics["system-costs"] = metrics["capex"] + metrics["opex"]
     metrics["energy-served"] = -energy_balance["load"]
@@ -519,14 +569,16 @@ def get_metrics(n):
     metrics["solar-lcoe"] = market_values.loc["Generator", "solar"]
 
     curtailment_mwh = n.statistics.curtailment().sum()
-    metrics["curtailment"] = curtailment_mwh / (curtailment_mwh + metrics["primary-energy"])
+    metrics["curtailment"] = curtailment_mwh / (
+        curtailment_mwh + metrics["primary-energy"]
+    )
 
     # multiple if statements since mixing of voll and elastic is possible
-    U = 0.
+    U = 0.0
     if n.meta["elastic"]:
         a = n.meta["elastic_intercept"]
         b = n.meta["elastic_intercept"] / n.meta["load"]
-        constant = a ** 2 / (2 * b) * weightings.sum()
+        constant = a**2 / (2 * b) * weightings.sum()
         Q2 = n.generators_t.p["load-shedding"] ** 2
         U += constant - b / 2 * Q2 @ weightings
     if n.meta["voll"]:

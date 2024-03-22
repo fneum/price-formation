@@ -67,7 +67,7 @@ def solve_network(n, config, attempt=1):
         solver_name=solver_name,
         solver_options=solver_options,
         assign_all_duals=True,
-        extra_functionality=add_battery_constraints
+        extra_functionality=add_battery_constraints,
     )
 
     if status != "ok":
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("solve", lt='inelastic+true')
+        snakemake = mock_snakemake("solve", lt="inelastic+true")
 
     # if snakemake.resources.attempt == 1:
     #     raise ValueError("Purposefully fail first attempt for testing.")
@@ -89,11 +89,11 @@ if __name__ == "__main__":
         snakemake.config,
         snakemake.wildcards,
     )
-    
+
     n = pypsa.Network(snakemake.input.network)
 
     set_snapshots(
-        n, 
+        n,
         snakemake.config["number_years"],
         snakemake.config["random_years"],
     )

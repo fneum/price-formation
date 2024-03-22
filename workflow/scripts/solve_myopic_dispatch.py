@@ -20,7 +20,9 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("solve_myopic_dispatch", lt="inelastic+true", st="horizon+100")
+        snakemake = mock_snakemake(
+            "solve_myopic_dispatch", lt="inelastic+true", st="horizon+100"
+        )
 
     set_scenario_config(
         snakemake.config,
@@ -40,13 +42,13 @@ if __name__ == "__main__":
     if "hydrogen storage" in n.stores.index:
         if hydrogen_bid == "series":
             # this only works if long-term and short-term model share same snapshots
-            n.stores_t.marginal_cost["hydrogen storage"] = n_solved.buses_t.marginal_price[
-                "hydrogen"
-            ]
+            n.stores_t.marginal_cost[
+                "hydrogen storage"
+            ] = n_solved.buses_t.marginal_price["hydrogen"]
         elif hydrogen_bid == "mean":
-            n.stores.at["hydrogen storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
-                "hydrogen"
-            ].mean()
+            n.stores.at[
+                "hydrogen storage", "marginal_cost"
+            ] = n_solved.buses_t.marginal_price["hydrogen"].mean()
         elif isinstance(hydrogen_bid, (float, int)):
             n.stores.at["hydrogen storage", "marginal_cost"] = hydrogen_bid
 
@@ -54,13 +56,13 @@ if __name__ == "__main__":
     if "battery storage" in n.stores.index:
         if battery_bid == "series":
             # this only works if long-term and short-term model share same snapshots
-            n.stores_t.marginal_cost["battery storage"] = n_solved.buses_t.marginal_price[
-                "battery"
-            ]
+            n.stores_t.marginal_cost[
+                "battery storage"
+            ] = n_solved.buses_t.marginal_price["battery"]
         elif battery_bid == "mean":
-            n.stores.at["battery storage", "marginal_cost"] = n_solved.buses_t.marginal_price[
-                "battery"
-            ].mean()
+            n.stores.at[
+                "battery storage", "marginal_cost"
+            ] = n_solved.buses_t.marginal_price["battery"].mean()
         elif isinstance(battery_bid, (float, int)):
             n.stores.at["battery storage", "marginal_cost"] = battery_bid
 
@@ -96,8 +98,9 @@ if __name__ == "__main__":
     else:
         with contextlib.ExitStack() as stack:
 
-            if solver_name == 'gurobi':
+            if solver_name == "gurobi":
                 import gurobipy
+
                 env = stack.enter_context(gurobipy.Env())
             else:
                 env = None

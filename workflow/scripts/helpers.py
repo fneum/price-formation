@@ -13,9 +13,9 @@ def literal_eval(s):
 
 def parse_to_dict(s):
     d = {}
-    for item in s.split('-'):
-        key, value = item.split('+', 1)
-        d[key] = parse_to_dict(value) if '+' in value else literal_eval(value)
+    for item in s.split("-"):
+        key, value = item.split("+", 1)
+        d[key] = parse_to_dict(value) if "+" in value else literal_eval(value)
     return d
 
 

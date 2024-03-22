@@ -8,6 +8,7 @@ from helpers import set_scenario_config
 
 logger = logging.getLogger(__name__)
 
+
 def annuity(r, n):
     if r == 0:
         return 1 / n
@@ -23,7 +24,9 @@ def load_technology_data(fn, defaults, years=1):
 
     df = df.value.unstack()[defaults.keys()].fillna(defaults)
 
-    annuity_factor = df.apply(lambda x: annuity(x["discount rate"], x["lifetime"]) * years, axis=1)
+    annuity_factor = df.apply(
+        lambda x: annuity(x["discount rate"], x["lifetime"]) * years, axis=1
+    )
 
     df["capital_cost"] = (annuity_factor + df["FOM"] / 100) * df["investment"]
 
@@ -47,7 +50,9 @@ def load_time_series(fn, country, snapshots, clip_p_max_pu=1e-2):
 def add_load(n, config):
     assert (
         sum([config["voll"], config["elastic"], config["inelastic"]]) == 1
-    ) or config["voll_share"], "Must choose exactly one of 'voll', 'elastic', 'inelastic' if elasticities are not mixed."
+    ) or config[
+        "voll_share"
+    ], "Must choose exactly one of 'voll', 'elastic', 'inelastic' if elasticities are not mixed."
 
     if config["voll"]:
         logger.info("Adding demand with VOLL.")
@@ -68,7 +73,7 @@ def add_load(n, config):
             "load-shedding",
             bus="electricity",
             carrier="load",
-            marginal_cost_quadratic=config["elastic_intercept"] / ( 2 * config["load"]),
+            marginal_cost_quadratic=config["elastic_intercept"] / (2 * config["load"]),
             p_nom=config["load"],
         )
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
@@ -78,14 +83,21 @@ def add_load(n, config):
 
     voll_share = config["voll_share"]
     if voll_share:
-        assert sum([config["voll"], config["elastic"]]) == 2, "Need both 'voll' and 'elastic' to mix elasticities."
+        assert (
+            sum([config["voll"], config["elastic"]]) == 2
+        ), "Need both 'voll' and 'elastic' to mix elasticities."
         logger.info("Mixing VOLL and elastic demand.")
-        sel = n.generators.query("marginal_cost_quadratic == 0. & carrier == 'load'").index
+        sel = n.generators.query(
+            "marginal_cost_quadratic == 0. & carrier == 'load'"
+        ).index
         n.generators.loc[sel, "p_nom"] *= voll_share
-        sel = n.generators.query("marginal_cost_quadratic != 0. & carrier == 'load'").index
-        n.generators.loc[sel, "p_nom"] *= (1 - voll_share)
-        n.generators.loc[sel, "marginal_cost_quadratic"] /= (1 - voll_share)
-        n.loads.at["load", "p_set"] *= (1 - voll_share)
+        sel = n.generators.query(
+            "marginal_cost_quadratic != 0. & carrier == 'load'"
+        ).index
+        n.generators.loc[sel, "p_nom"] *= 1 - voll_share
+        n.generators.loc[sel, "marginal_cost_quadratic"] /= 1 - voll_share
+        n.loads.at["load", "p_set"] *= 1 - voll_share
+
 
 def add_solar(n, config, tech_data, p_max_pu):
     if not config["solar"]:
@@ -101,6 +113,7 @@ def add_solar(n, config, tech_data, p_max_pu):
         marginal_cost=0.1,  # Small cost to prefer curtailment to destroying energy in storage, solar curtails before wind
         capital_cost=tech_data.at["solar", "capital_cost"],
     )
+
 
 def add_wind(n, config, tech_data, p_max_pu):
     if not config["wind"]:
@@ -200,7 +213,9 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("prepare", lt='number_years+1-elastic+true-elastic_intercept+200')
+        snakemake = mock_snakemake(
+            "prepare", lt="number_years+1-elastic+true-elastic_intercept+200"
+        )
 
     set_scenario_config(
         snakemake.config,
@@ -218,7 +233,9 @@ if __name__ == "__main__":
     years = snakemake.config["number_years"]
     if not years:
         freq = snakemake.config["snapshots"]["freq"]
-        years = (n.snapshots[-1] - n.snapshots[0] + pd.Timedelta(freq)) / np.timedelta64(1,'Y')
+        years = (
+            n.snapshots[-1] - n.snapshots[0] + pd.Timedelta(freq)
+        ) / np.timedelta64(1, "Y")
 
     tech_data = load_technology_data(
         snakemake.input.tech_data,
@@ -227,8 +244,12 @@ if __name__ == "__main__":
     )
 
     clip_p_max_pu = snakemake.config["clip_p_max_pu"]
-    solar_cf = load_time_series(snakemake.input.solar_cf, country, n.snapshots, clip_p_max_pu)
-    onwind_cf = load_time_series(snakemake.input.onwind_cf, country, n.snapshots, clip_p_max_pu)
+    solar_cf = load_time_series(
+        snakemake.input.solar_cf, country, n.snapshots, clip_p_max_pu
+    )
+    onwind_cf = load_time_series(
+        snakemake.input.onwind_cf, country, n.snapshots, clip_p_max_pu
+    )
 
     n.add("Bus", "electricity", carrier="electricity")
 

@@ -59,15 +59,15 @@
 \begin{frontmatter}
 
 	\title{Price Formation in 100\% Variable Renewable Electricity Systems:\\Demand Elasticity and Storage Bidding}
-  
+
 	\author[tub]{Tom~Brown}
 	\author[tub]{Fabian~Neumann\corref{cor1}}
 	\ead{f.neumann@tu-berlin.de}
 	\author[tub]{Iegor~Riepin}
-  
+
 	\cortext[cor1]{Corresponding author}
 	\address[tub]{Department of Digital Transformation in Energy Systems, Institute of Energy Technology, Technische Universität Berlin (TUB), Einsteinufer 25 (TA 8), 10587, Berlin, Germany}
-  
+
 	\fntext[label3]{Authors are listed in alphabetical order.}
 
   \end{frontmatter}
@@ -108,7 +108,7 @@ storage and a willingness to sell at a certain price to discharge the storage.
 Bidding strategies of storage units then result in additional price levels so
 that their price arbitrage covers their investment costs. It was shown in
 \cite{Brown2020} that in long-term models storage make back their costs exactly
-from the market prices, in accordance with the zero-profit rule. 
+from the market prices, in accordance with the zero-profit rule.
 
 We show how these storage bidding strategies work in math, using
 \textit{effective bids} presented in \cite{Brown2020}. Effective bids are
@@ -338,7 +338,7 @@ compensate.
 Now consider the case where the storage energy capacity $G^{\textrm{ene}}_r$ is
 also co-optimized, adding to the objective function of the long-term model
 $-\sum_r c^{\textrm{ene}}_r G^{\textrm{ene}}_r$. The variable for the state of
-charge is $g^{\textrm{ene}}_{r,t}$ with the cyclicity constraint corresponding to 
+charge is $g^{\textrm{ene}}_{r,t}$ with the cyclicity constraint corresponding to
 \eqref{eq:storconstraint}:
 \begin{equation}
   g^{\textrm{ene}}_{r,0} = g^{\textrm{ene}}_{r,T} = g^{\textrm{ene}}_{r,0} + \sum_{t'=1}^T \left( \eta^{\textrm{sto}}_r g^{\textrm{sto}}_{r,t'} - (\eta^{\textrm{dis}}_r)^{-1} g^{\textrm{dis}}_{r,t'} \right)   \hspace{1cm}\perp \hspace{1cm} \lambda_{r} \hspace{1cm} \forall r
@@ -406,7 +406,7 @@ typical capital costs spikes observed in models with inelastic demand, yielding
 a much smoother price duration curve even in systems that do not include any
 fuel costs, the extent of which is determined by the level of price elasticity.
 Only around 50\% of the hours show prices at 0~\euro/MWh with elastic demand,
-compared to around 10\% with perfectly inelastic demand or a VoLL. 
+compared to around 10\% with perfectly inelastic demand or a VoLL.
 
 We also observe that by including price elasticity, annual mean prices are more
 stable between different weather years. For investors this means more

@@ -58,7 +58,7 @@ rule solve:
     output:
         network=RESULTS + "network_solved_LT-{lt}.nc",
         statistics=RESULTS + "summary/LT-{lt}/statistics.csv",
-    resources: 
+    resources:
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
         attempt=get_attempt,
