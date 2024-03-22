@@ -7,7 +7,8 @@ The solar and wind time series for 1950-2020 are taken from from [Bloomfield and
 ## Installation
 
 ```sh
-mamba create -f workflow/envs/environment.yaml
+conda update conda
+conda env create -f workflow/envs/environment.yaml
 ```
 
 ## Run
