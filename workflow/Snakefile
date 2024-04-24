@@ -65,7 +65,7 @@ rule solve:
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
         attempt=get_attempt,
-    threads: 4
+    threads: 8
     retries: 1
     benchmark: RESULTS + "benchmarks/LT-{lt}.log"
     conda:
@@ -108,7 +108,7 @@ rule solve_myopic_dispatch:
     resources:
         mem_mb=config["solver"]["mem_mb"],
         walltime=config["solver"]["walltime"],
-    threads: 4
+    threads: 8
     retries: 1
     benchmark: RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
     conda:
