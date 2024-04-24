@@ -34,7 +34,7 @@ def load_technology_data(fn, defaults, years=1):
 
 
 def load_time_series(fn, country, snapshots, clip_p_max_pu=1e-2):
-    snapshots = pd.date_range("1950-01-01", "2021-01-01", inclusive="left", freq="H")
+    snapshots = pd.date_range("1950-01-01", "2021-01-01", inclusive="left", freq="h")
 
     ds = xr.open_dataset(fn)
 
@@ -235,7 +235,7 @@ if __name__ == "__main__":
         freq = snakemake.config["snapshots"]["freq"]
         years = (
             n.snapshots[-1] - n.snapshots[0] + pd.Timedelta(freq)
-        ) / np.timedelta64(1, "Y")
+        ) / np.timedelta64(365, "D")
 
     tech_data = load_technology_data(
         snakemake.input.tech_data,
