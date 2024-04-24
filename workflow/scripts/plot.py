@@ -4,6 +4,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import pypsa
 from helpers import set_scenario_config
 from pypsa.descriptors import get_switchable_as_dense as as_dense
@@ -109,13 +110,13 @@ def get_cost_recovery(n, segments="pricebands"):
     )
 
     if segments == "months":
-        revenue = revenue.groupby(revenue.columns.month, axis=1).sum()
+        revenue = revenue.T.groupby(revenue.columns.month).sum().T
         revenue.columns = revenue.columns.map(calendar.month_abbr.__getitem__)
     elif segments == "pricebands":
         lmps = n.buses_t.marginal_price["electricity"]
         bins = [0, 10, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
         bins = [v for v in bins if v < max(lmps)] + [max(lmps) + 1]
-        revenue = revenue.groupby(pd.cut(lmps, bins=bins, precision=0), axis=1).sum()
+        revenue = revenue.T.groupby(pd.cut(lmps, bins=bins, precision=0), observed=False).sum().T
 
     costs = (
         (n.statistics.opex() + n.statistics.capex())
@@ -612,6 +613,7 @@ if __name__ == "__main__":
     )
 
     plt.style.use(["bmh", snakemake.input.matplotlibrc])
+    sns.set_palette(snakemake.config["color_palette"])
 
     n = pypsa.Network(snakemake.input.network)
 
