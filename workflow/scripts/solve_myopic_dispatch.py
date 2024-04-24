@@ -89,6 +89,9 @@ if __name__ == "__main__":
         exclude_years=exclude_years,
     )
 
+    if solver_name == "gurobi":
+        logging.getLogger("gurobipy").setLevel(logging.CRITICAL)
+
     if snakemake.config["myopic"]["perfect_foresight"]:
         n.optimize(
             solver_name=solver_name,

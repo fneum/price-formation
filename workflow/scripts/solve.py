@@ -58,6 +58,9 @@ def solve_network(n, config, attempt=1):
     profile = config["solver"]["options"]
     solver_options = config["solver_options"][profile]
 
+    if solver_name == "gurobi":
+        logging.getLogger("gurobipy").setLevel(logging.CRITICAL)
+
     if attempt > 1 and solver_name == "gurobi":
         numeric_profile = "gurobi-numeric"
         logger.info(f"Retry with {numeric_profile} solver settings.")
@@ -81,9 +84,6 @@ if __name__ == "__main__":
         from helpers import mock_snakemake
 
         snakemake = mock_snakemake("solve", lt="inelastic+true")
-
-    # if snakemake.resources.attempt == 1:
-    #     raise ValueError("Purposefully fail first attempt for testing.")
 
     set_scenario_config(
         snakemake.config,
