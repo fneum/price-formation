@@ -1,4 +1,4 @@
-run: "single"
+run: "default"
 
 scenario:
   lt:
@@ -50,7 +50,7 @@ zero_cost_storage: false
 
 technology_data:
   year: 2030
-  version: v0.6.0
+  version: v0.8.1
   fill_values:
     FOM: 0
     VOM: 0
@@ -63,50 +63,47 @@ snapshots:
   start: "2020-01-01"
   end: "2021-01-01"
   inclusive: left
-  freq: 1H
+  freq: 1h
 
 clip_p_max_pu: 1.e-2
 
 cluster-sync:
-    url: zecm
+    url: z1
     send-ignore: .syncignore-send
     receive-ignore: .syncignore-receive
-    cluster-base-dir: /scratch/fneum/projects/price-formation
+    cluster-base-dir: SCRATCH/projects/price-formation
     custom-args: "" # e.g. -n for dry-run
 
 solver:
   name: gurobi
   options: gurobi-default
   mem_mb: 24000
-  walltime: "24:00:00"
+  walltime: "12:00:00"
 
 myopic_solver:
-  name: gurobi # highs
-  options: gurobi-default # highs-default
-  mem_mb: 24000
+  name: gurobi
+  options: gurobi-default
+  mem_mb: 8000
   walltime: "24:00:00"
 
 solver_options:
   gurobi-default:
     threads: 4
-    method: 2 # barrier
+    method: 2
     crossover: 0
     BarConvTol: 1.e-8
     Seed: 123
     AggFill: 0
     PreDual: 0
-    GURO_PAR_BARDENSETHRESH: 200
     seed: 10
   gurobi-numeric:
     BarHomogeneous: 1
-    # NumericFocus: 1
     Presolve: 0
     Aggregate: 0
     Quad: 1
     MarkowitzTol: 0.2
   highs-default:
     threads: 4
-    solver: "ipm"
     run_crossover: "off"
     small_matrix_value: 1e-6
     large_matrix_value: 1e10
@@ -151,6 +148,8 @@ colors:
   electricity: "#7eae51"
   load: "#7eae51"
   load-shedding: "#bac7ad"
+
+color_palette: colorblind
 
 preferred_order:
   - load
