@@ -1,7 +1,3 @@
-# SPDX-FileCopyrightText: : 2017-2023 The PyPSA-Eur Authors
-#
-# SPDX-License-Identifier: MIT
-
 name: price-formation
 channels:
 - conda-forge
@@ -10,8 +6,8 @@ channels:
 dependencies:
 - python==3.11
 - pip
-- pypsa==0.25.1
-- linopy>=0.2.6
+- pypsa==0.27.1
+- linopy>=0.3.8
 - snakemake-minimal>=8.5
 - pandas
 - numpy
@@ -24,6 +20,7 @@ dependencies:
 - gurobi
 - ipykernel
 - seaborn
+- jupyterlab
 - pre-commit
 - snakemake-storage-plugin-http
 - snakemake-executor-plugin-cluster-generic
