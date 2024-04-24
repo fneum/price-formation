@@ -1,0 +1,3 @@
+[submodule "report/elasticity-paper"]
+	path = report/paper
+	url = git@github.com:nworbmot/elasticity-paper.git
