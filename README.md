@@ -16,11 +16,11 @@ conda env create -f workflow/envs/environment.yaml
 From root of repository:
 
 ```sh
-snakemake -call --use-conda plot_all
+snakemake -call --use-conda --conda-frontend conda
 ```
 
 ## Cluster
 
 ```sh
-snakemake -j32 --profile slurm --use-conda plot_all
+snakemake -call --profile slurm --use-conda --conda-frontend conda
 ```
