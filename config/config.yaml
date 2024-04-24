@@ -15,6 +15,7 @@ load: 100 # MW
 
 voll: false
 elastic: false
+elastic_pwl: false # piecewise-linear
 inelastic: false
 
 voll_share: false # share of VoLL in demand
@@ -27,6 +28,20 @@ battery: true
 
 elastic_intercept: 2000 # €/MWh
 voll_price: 2000 # €/MWh
+
+elastic_pwl_params:
+  default:
+    intercept: [8000, 400, 200]
+    slope: [80, 40, 20]
+    nominal: [95, 5, 10]
+  lower:
+    intercept: [16000, 800, 400]
+    slope: [160, 80, 40]
+    nominal: [95, 5, 10]
+  higher:
+    intercept: [4000, 200, 100]
+    slope: [40, 20, 10]
+    nominal: [95, 5, 10]
 
 number_years: false
 random_years: true

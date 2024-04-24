@@ -48,12 +48,12 @@ def load_time_series(fn, country, snapshots, clip_p_max_pu=1e-2):
 
 
 def add_load(n, config):
-    assert (
-        sum([config["voll"], config["elastic"], config["inelastic"]]) == 1
-    ) or config[
+    number_options = sum(
+        [config["voll"], config["elastic"], config["inelastic"], config["elastic_pwl"]]
+    )
+    assert (number_options == 1) or config[
         "voll_share"
-    ], "Must choose exactly one of 'voll', 'elastic', 'inelastic' if elasticities are not mixed."
-
+    ], "Must choose exactly one of 'voll', 'elastic', 'elastic_pwl', 'inelastic' if elasticities are not mixed."
     if config["voll"]:
         logger.info("Adding demand with VOLL.")
         n.add(
@@ -77,6 +77,31 @@ def add_load(n, config):
             p_nom=config["load"],
         )
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
+    if param_set := config["elastic_pwl"]:
+        logger.info(f"Adding piecewise linear elastic demand with set '{param_set}'.")
+        pwl = config["elastic_pwl_params"][param_set]
+        assert (
+            len(pwl["intercept"]) == len(pwl["slope"]) == len(pwl["nominal"])
+        ), "Piecewise linear demand must have same number of points for intercept, slope, and nominal."
+        for i, (intercept, slope, nominal) in enumerate(
+            zip(pwl["intercept"], pwl["slope"], pwl["nominal"])
+        ):
+            n.add(
+                "Generator",
+                f"load-shedding-segment-{i}",
+                bus="electricity",
+                carrier="load",
+                marginal_cost=intercept - slope * nominal,
+                marginal_cost_quadratic=slope / 2,
+                p_nom=nominal,
+            )
+        n.add(
+            "Load",
+            "load",
+            bus="electricity",
+            carrier="load",
+            p_set=sum(pwl["nominal"]),
+        )
     if config["inelastic"]:
         logger.info("Adding inelastic demand.")
         n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
