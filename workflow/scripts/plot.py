@@ -118,8 +118,13 @@ def get_cost_recovery(n, segments="pricebands"):
         bins = [v for v in bins if v < max(lmps)] + [max(lmps) + 1]
         revenue = revenue.T.groupby(pd.cut(lmps, bins=bins, precision=0), observed=False).sum().T
 
+    capex = n.statistics.capex()
+    opex = n.statistics.opex()
+    index = opex.index.union(capex.index)
+    opex = opex.reindex(index).fillna(0.0)
+    capex = capex.reindex(index).fillna(0.0)
     costs = (
-        (n.statistics.opex() + n.statistics.capex())
+        (capex + opex)
         .droplevel(0)
         .drop("load", errors="ignore")
         .groupby(merge_battery)
