@@ -5,7 +5,9 @@ from snakemake.utils import min_version
 
 min_version("8.5")
 
+
 configfile: "config/config.yaml"
+
 
 localrules:
     download_technology_data,
@@ -13,19 +15,26 @@ localrules:
     send,
     receive,
 
+
 wildcard_constraints:
-    lt="[^/]+" # cannot include folder separators
+    lt="[^/]+",  # cannot include folder separators
+
 
 RESULTS = "results/" + (config["run"] + "/" if config["run"] else "")
 
+
 rule download_weather_data:
     params:
-        dir="resources/reading"
+        dir="resources/reading",
     input:
-        storage("https://researchdata.reading.ac.uk/321/4/ERA5_data_1950-2020.zip")
+        storage("https://researchdata.reading.ac.uk/321/4/ERA5_data_1950-2020.zip"),
     output:
-        protected("resources/reading/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc"),
-        protected("resources/reading/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc")
+        protected(
+            "resources/reading/ERA5_data_1950-2020/wp_onshore/NUTS_0_wp_ons_sim_0_historical_loc_weighted.nc"
+        ),
+        protected(
+            "resources/reading/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc"
+        ),
     run:
         unpack_archive(input[0], params.dir)
 
@@ -52,8 +61,10 @@ rule prepare:
     script:
         "scripts/prepare.py"
 
+
 def get_attempt(wildcards, attempt):
     return attempt
+
 
 rule solve:
     input:
@@ -67,7 +78,8 @@ rule solve:
         attempt=get_attempt,
     threads: config["solver"]["threads"]
     retries: 1
-    benchmark: RESULTS + "benchmarks/LT-{lt}.log"
+    benchmark:
+        RESULTS + "benchmarks/LT-{lt}.log"
     conda:
         "envs/environment.yaml"
     script:
@@ -76,9 +88,13 @@ rule solve:
 
 rule plot:
     input:
+        **rules.solve.output,
         matplotlibrc="matplotlibrc",
-        **rules.solve.output
     output:
+        **{
+            sns: RESULTS + "graphics/LT-{lt}/supply_demand_" + sns + ".pdf"
+            for sns in config["supply_demand_curve"]["snapshots"]
+        },
         price_duration=RESULTS + "graphics/LT-{lt}/price_duration.pdf",
         load_duration=RESULTS + "graphics/LT-{lt}/load_duration.pdf",
         price_time_series=RESULTS + "graphics/LT-{lt}/price_time_series.pdf",
@@ -89,7 +105,6 @@ rule plot:
         cost_recovery=RESULTS + "graphics/LT-{lt}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/soc.pdf",
         metrics=RESULTS + "summary/LT-{lt}/metrics.csv",
-        **{sns: RESULTS + "graphics/LT-{lt}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     resources:
         mem_mb=8000,
     conda:
@@ -110,7 +125,8 @@ rule solve_myopic_dispatch:
         runtime=config["myopic_solver"]["runtime"],
     threads: config["myopic_solver"]["threads"]
     retries: 1
-    benchmark: RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
+    benchmark:
+        RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
     conda:
         "envs/environment.yaml"
     script:
@@ -119,9 +135,13 @@ rule solve_myopic_dispatch:
 
 rule plot_myopic_dispatch:
     input:
+        **rules.solve_myopic_dispatch.output,
         matplotlibrc="matplotlibrc",
-        **rules.solve_myopic_dispatch.output
     output:
+        **{
+            sns: RESULTS + "graphics/LT-{lt}/ST-{st}/supply_demand_" + sns + ".pdf"
+            for sns in config["supply_demand_curve"]["snapshots"]
+        },
         price_duration=RESULTS + "graphics/LT-{lt}/ST-{st}/price_duration.pdf",
         load_duration=RESULTS + "graphics/LT-{lt}/ST-{st}/load_duration.pdf",
         price_time_series=RESULTS + "graphics/LT-{lt}/ST-{st}/price_time_series.pdf",
@@ -132,7 +152,6 @@ rule plot_myopic_dispatch:
         cost_recovery=RESULTS + "graphics/LT-{lt}/ST-{st}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/ST-{st}/soc.pdf",
         metrics=RESULTS + "summary/LT-{lt}/ST-{st}/metrics.csv",
-        **{sns: RESULTS + "graphics/LT-{lt}/ST-{st}/supply_demand_" + sns + ".pdf" for sns in config["supply_demand_curve"]["snapshots"]}
     resources:
         mem_mb=8000,
     conda:
@@ -143,17 +162,17 @@ rule plot_myopic_dispatch:
 
 rule clean:
     run:
-         import shutil
+        import shutil
 
-         shutil.rmtree("results")
+        shutil.rmtree("results")
 
 
 rule send:
     params:
-        send_ignore = config["cluster-sync"]["send-ignore"],
-        url = config["cluster-sync"]["url"],
-        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"],
-        custom_args = config["cluster-sync"]["custom-args"],
+        send_ignore=config["cluster-sync"]["send-ignore"],
+        url=config["cluster-sync"]["url"],
+        cluster_base_dir=config["cluster-sync"]["cluster-base-dir"],
+        custom_args=config["cluster-sync"]["custom-args"],
     shell:
         """
         rsync -ravzh --progress --update --no-g {params.custom_args} . --exclude-from={params.send_ignore} {params.url}:{params.cluster_base_dir}
@@ -162,10 +181,10 @@ rule send:
 
 rule receive:
     params:
-        receive_ignore = config["cluster-sync"]["receive-ignore"],
-        url = config["cluster-sync"]["url"],
-        cluster_base_dir = config["cluster-sync"]["cluster-base-dir"] + "/",
-        custom_args = config["cluster-sync"]["custom-args"],
+        receive_ignore=config["cluster-sync"]["receive-ignore"],
+        url=config["cluster-sync"]["url"],
+        cluster_base_dir=config["cluster-sync"]["cluster-base-dir"] + "/",
+        custom_args=config["cluster-sync"]["custom-args"],
     shell:
         """
         rsync -ravzh --progress --update --exclude-from={params.receive_ignore} {params.custom_args} {params.url}:{params.cluster_base_dir} .
@@ -175,25 +194,25 @@ rule receive:
 rule all:
     input:
         expand(rules.plot_myopic_dispatch.output[0], **config["scenario"]),
-        expand(rules.plot.output[0], **config["scenario"])
+        expand(rules.plot.output[0], **config["scenario"]),
     default_target: True
 
 
 rule solve_myopic_dispatch_all:
     input:
-        expand(rules.solve_myopic_dispatch.output[0], **config["scenario"])
+        expand(rules.solve_myopic_dispatch.output[0], **config["scenario"]),
 
 
 rule plot_all:
     input:
-        expand(rules.plot.output[0], **config["scenario"])
+        expand(rules.plot.output[0], **config["scenario"]),
 
 
 rule solve_all:
     input:
-        expand(rules.solve.output[0], **config["scenario"])
+        expand(rules.solve.output[0], **config["scenario"]),
 
 
 rule prepare_all:
     input:
-        expand(rules.prepare.output[0], **config["scenario"])
+        expand(rules.prepare.output[0], **config["scenario"]),

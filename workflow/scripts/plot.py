@@ -116,7 +116,11 @@ def get_cost_recovery(n, segments="pricebands"):
         lmps = n.buses_t.marginal_price["electricity"]
         bins = [0, 10, 50, 100, 200, 300, 400, 500, 1000, 2000, 5000]
         bins = [v for v in bins if v < max(lmps)] + [max(lmps) + 1]
-        revenue = revenue.T.groupby(pd.cut(lmps, bins=bins, precision=0), observed=False).sum().T
+        revenue = (
+            revenue.T.groupby(pd.cut(lmps, bins=bins, precision=0), observed=False)
+            .sum()
+            .T
+        )
 
     capex = n.statistics.capex()
     opex = n.statistics.opex()
@@ -619,8 +623,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
 
-        snakemake = mock_snakemake("plot", lt="country+DE-elastic+true")
-        # snakemake = mock_snakemake("plot_myopic_dispatch", lt="inelastic+true", st="horizon+96")
+        snakemake = mock_snakemake("plot", lt="country+DE-elastic_pwl+default")
 
     set_scenario_config(
         snakemake.config,
