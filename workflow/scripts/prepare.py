@@ -255,7 +255,11 @@ if __name__ == "__main__":
 
     n.snapshot_weightings.loc[:, :] = float(snakemake.config["snapshots"]["freq"][:-1])
 
-    years = snakemake.config["number_years"]
+    if snakemake.config["fixed_year"]:
+        years = 1
+    else:
+        years = snakemake.config["number_years"]
+
     if not years:
         freq = snakemake.config["snapshots"]["freq"]
         years = (

@@ -10,7 +10,14 @@ import random
 random.seed(123)
 
 
-def set_snapshots(n, number_years=False, random_years=False, exclude_years=[]):
+def set_snapshots(
+    n, number_years=False, random_years=False, fixed_year=False, exclude_years=[]
+):
+
+    if fixed_year:
+        logger.info("Fixed year %s specified. Clipping snapshots.", fixed_year)
+        n.snapshots = n.snapshots[n.snapshots.year.isin([fixed_year])]
+        return
 
     if not number_years:
         logger.info("No subset of years selected. Keep all snapshots.")
@@ -98,6 +105,7 @@ if __name__ == "__main__":
         n,
         snakemake.config["number_years"],
         snakemake.config["random_years"],
+        snakemake.config["fixed_year"],
     )
 
     solve_network(n, snakemake.config, snakemake.resources.attempt)

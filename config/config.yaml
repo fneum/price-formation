@@ -45,6 +45,7 @@ elastic_pwl_params:
 
 number_years: false
 random_years: true
+fixed_year: false
 
 zero_cost_storage: false
 
