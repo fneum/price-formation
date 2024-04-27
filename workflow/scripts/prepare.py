@@ -48,8 +48,9 @@ def load_time_series(fn, country, snapshots, clip_p_max_pu=1e-2):
 
 
 def add_load(n, config):
+    elastic_pwl = True if config["elastic_pwl"] else False
     number_options = sum(
-        [config["voll"], config["elastic"], config["inelastic"], config["elastic_pwl"]]
+        [config["voll"], config["elastic"], config["inelastic"], elastic_pwl]
     )
     assert (number_options == 1) or config[
         "voll_share"
