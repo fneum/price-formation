@@ -91,6 +91,7 @@ if __name__ == "__main__":
 
     if solver_name == "gurobi":
         logging.getLogger("gurobipy").setLevel(logging.CRITICAL)
+        solver_options["threads"] = snakemake.config["myopic_solver"]["threads"]
 
     if snakemake.config["myopic"]["perfect_foresight"]:
         n.optimize(

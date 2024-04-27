@@ -63,9 +63,9 @@ rule solve:
         statistics=RESULTS + "summary/LT-{lt}/statistics.csv",
     resources:
         mem_mb=config["solver"]["mem_mb"],
-        walltime=config["solver"]["walltime"],
+        runtime=config["solver"]["runtime"],
         attempt=get_attempt,
-    threads: 8
+    threads: config["solver"]["threads"]
     retries: 1
     benchmark: RESULTS + "benchmarks/LT-{lt}.log"
     conda:
@@ -106,9 +106,9 @@ rule solve_myopic_dispatch:
         network=RESULTS + "network_myopic_LT-{lt}_ST-{st}.nc",
         statistics=RESULTS + "summary/LT-{lt}/ST-{st}/statistics.csv",
     resources:
-        mem_mb=config["solver"]["mem_mb"],
-        walltime=config["solver"]["walltime"],
-    threads: 8
+        mem_mb=config["myopic_solver"]["mem_mb"],
+        runtime=config["myopic_solver"]["runtime"],
+    threads: config["myopic_solver"]["threads"]
     retries: 1
     benchmark: RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
     conda:

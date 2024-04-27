@@ -77,18 +77,19 @@ cluster-sync:
 solver:
   name: gurobi
   options: gurobi-default
+  threads: 8
   mem_mb: 24000
-  walltime: "12:00:00"
+  runtime: 12h
 
 myopic_solver:
   name: gurobi
+  threads: 2
   options: gurobi-default
   mem_mb: 8000
-  walltime: "24:00:00"
+  runtime: 24h
 
 solver_options:
   gurobi-default:
-    threads: 4
     method: 2
     crossover: 0
     BarConvTol: 1.e-8
@@ -97,13 +98,12 @@ solver_options:
     PreDual: 0
     seed: 10
   gurobi-numeric:
-    BarHomogeneous: 1
-    Presolve: 0
-    Aggregate: 0
-    Quad: 1
-    MarkowitzTol: 0.2
+    method: 2
+    crossover: 0
+    BarConvTol: 1.e-7
+    NumericFocus: 2
+    Seed: 456
   highs-default:
-    threads: 4
     run_crossover: "off"
     small_matrix_value: 1e-6
     large_matrix_value: 1e10

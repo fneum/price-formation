@@ -60,11 +60,13 @@ def solve_network(n, config, attempt=1):
 
     if solver_name == "gurobi":
         logging.getLogger("gurobipy").setLevel(logging.CRITICAL)
+        solver_options["threads"] = config["solver"]["threads"]
 
     if attempt > 1 and solver_name == "gurobi":
         numeric_profile = "gurobi-numeric"
         logger.info(f"Retry with {numeric_profile} solver settings.")
-        solver_options.update(config["solver_options"][numeric_profile])
+        solver_options = config["solver_options"][numeric_profile]
+        solver_options["threads"] = config["solver"]["threads"]
 
     status, condition = n.optimize(
         solver_name=solver_name,
