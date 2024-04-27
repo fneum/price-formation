@@ -581,6 +581,16 @@ def get_metrics(n):
 
     # multiple if statements since mixing of voll and elastic is possible
     U = 0.0
+    if case := n.meta["elastic_pwl"]:
+        pwl = n.meta["elastic_pwl_params"][case]
+        for i, (a, b, load) in enumerate(
+            zip(pwl["intercept"], pwl["slope"], pwl["nominal"])
+        ):
+            Q = n.generators_t.p[f"load-shedding-segment-{i}"]
+            constant = a * load * weightings.sum()
+            intersection = a - b * load
+            load_shedding_cost = intersection * Q - b / 2 * Q**2
+            U += constant - load_shedding_cost @ weightings
     if n.meta["elastic"]:
         a = n.meta["elastic_intercept"]
         b = n.meta["elastic_intercept"] / n.meta["load"]
