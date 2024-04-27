@@ -16,7 +16,7 @@ report.html
 researchdata.reading.ac.uk
 workflow
 
-*.nc
+# *.nc
 
 ARCHIVE*
 notes
@@ -24,5 +24,5 @@ report
 config/scenarios.yaml
 logs
 
-*energy_balance.pdf
+# *energy_balance.pdf
 *energy_balance.csv
