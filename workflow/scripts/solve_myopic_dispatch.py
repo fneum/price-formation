@@ -68,14 +68,16 @@ if __name__ == "__main__":
 
     n.stores.e_cyclic = snakemake.config["myopic"]["cyclic"]
 
+    perturbation = snakemake.config["myopic"]["perturbation"]
+    if perturbation != 1:
+        logger.info("Applying capacity perturbation of factor %s", perturbation)
     for c in n.iterate_components({"Generator", "Link", "Store"}):
         attr = "e_nom" if c.name == "Store" else "p_nom"
-        perturbation = snakemake.config["myopic"]["perturbation"]
         if isinstance(perturbation, dict):
             for carrier, perturbation in perturbation.items():
                 c.df.loc[c.df.carrier == carrier, attr] *= perturbation
         elif isinstance(perturbation, (float, int)):
-            c.df[attr] *= perturbation
+            c.df.loc[c.df.carrier != 'load', attr] *= perturbation
         else:
             raise ValueError(f"Unknown perturbation type {type(perturbation)}")
 
