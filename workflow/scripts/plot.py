@@ -152,6 +152,16 @@ def get_price_duration(n, bus="electricity"):
     return df
 
 
+def get_storage_value_duration(n, name="hydrogen storage"):
+    df = (
+        n.stores_t.mu_energy_balance[name]
+        .sort_values(ascending=False)
+        .reset_index(drop=True)
+    )
+    df.index = np.arange(0, 100, 100 / len(df.index))
+    return df
+
+
 def get_load_duration(n):
 
     df = (
