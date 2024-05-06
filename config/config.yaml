@@ -59,6 +59,12 @@ technology_data:
     investment: 0
     lifetime: 25
     discount rate: 0.07
+  overrides:
+    electrolysis:
+      investment: 1500 # €/kW
+    hydrogen storage underground:
+      investment: 0.15 # €/kWh 
+
 
 snapshots:
   start: "2020-01-01"

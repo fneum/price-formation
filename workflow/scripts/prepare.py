@@ -16,13 +16,19 @@ def annuity(r, n):
         return r / (1 - 1 / (1 + r) ** n)
 
 
-def load_technology_data(fn, defaults, years=1):
+def load_technology_data(fn, defaults, overrides=False, years=1):
     df = pd.read_csv(fn, index_col=[0, 1])
 
     df.loc[df.unit.str.contains("/kW"), "value"] *= 1e3
     df.unit = df.unit.str.replace("/kW", "/MW")
 
     df = df.value.unstack()[defaults.keys()].fillna(defaults)
+
+    if overrides:
+        for tech, tech_overrides in overrides.items():
+            for attr, value in tech_overrides.items():
+                # overrides are in kW, convert to MW
+                df.loc[tech, attr] = value * 1e3
 
     annuity_factor = df.apply(
         lambda x: annuity(x["discount rate"], x["lifetime"]) * years, axis=1
@@ -238,9 +244,9 @@ def add_hydrogen(n, config, tech_data):
 if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
-
+        from pathlib import Path
         snakemake = mock_snakemake(
-            "prepare", lt="number_years+1-elastic+true-elastic_intercept+200"
+            "prepare", lt="number_years+1-elastic+true-elastic_intercept+200", configfiles=[Path("../config/config.yaml")]
         )
 
     set_scenario_config(
@@ -270,6 +276,7 @@ if __name__ == "__main__":
     tech_data = load_technology_data(
         snakemake.input.tech_data,
         snakemake.config["technology_data"]["fill_values"],
+        snakemake.config["technology_data"]["overrides"],
         years,
     )
 
