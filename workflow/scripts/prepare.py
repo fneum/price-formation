@@ -245,8 +245,11 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from helpers import mock_snakemake
         from pathlib import Path
+
         snakemake = mock_snakemake(
-            "prepare", lt="number_years+1-elastic+true-elastic_intercept+200", configfiles=[Path("../config/config.yaml")]
+            "prepare",
+            lt="number_years+1-elastic+true-elastic_intercept+200",
+            configfiles=[Path("../config/config.yaml")],
         )
 
     set_scenario_config(

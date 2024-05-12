@@ -77,7 +77,7 @@ if __name__ == "__main__":
             for carrier, perturbation in perturbation.items():
                 c.df.loc[c.df.carrier == carrier, attr] *= perturbation
         elif isinstance(perturbation, (float, int)):
-            c.df.loc[c.df.carrier != 'load', attr] *= perturbation
+            c.df.loc[c.df.carrier != "load", attr] *= perturbation
         else:
             raise ValueError(f"Unknown perturbation type {type(perturbation)}")
 
