@@ -77,7 +77,7 @@ rule solve:
         runtime=config["solver"]["runtime"],
         attempt=get_attempt,
     threads: config["solver"]["threads"]
-    retries: 1
+    retries: 3
     benchmark:
         RESULTS + "benchmarks/LT-{lt}.log"
     conda:

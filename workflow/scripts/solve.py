@@ -74,6 +74,8 @@ def solve_network(n, config, attempt=1):
         logger.info(f"Retry with {numeric_profile} solver settings.")
         solver_options = config["solver_options"][numeric_profile]
         solver_options["threads"] = config["solver"]["threads"]
+        solver_options["NumericFocus"] = min(2, max(attempt - 1, 1))
+        solver_options["Seed"] = random.randint(1, 999)
 
     status, condition = n.optimize(
         solver_name=solver_name,
