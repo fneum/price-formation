@@ -107,8 +107,10 @@ solver_options:
   gurobi-numeric:
     method: 2
     crossover: 0
-    BarConvTol: 5.e-8
+    BarConvTol: 1.e-8
     NumericFocus: 1
+    AggFill: 0
+    PreDual: 0
   highs-default:
     run_crossover: "off"
     small_matrix_value: 1e-6

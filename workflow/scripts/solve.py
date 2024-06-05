@@ -9,6 +9,8 @@ import random
 
 random.seed(123)
 
+from numpy.random import randint
+
 
 def set_snapshots(
     n, number_years=False, random_years=False, fixed_year=False, exclude_years=[]
@@ -75,7 +77,7 @@ def solve_network(n, config, attempt=1):
         solver_options = config["solver_options"][numeric_profile]
         solver_options["threads"] = config["solver"]["threads"]
         solver_options["NumericFocus"] = min(2, max(attempt - 1, 1))
-        solver_options["Seed"] = random.randint(1, 999)
+        solver_options["Seed"] = randint(1, 999)
 
     status, condition = n.optimize(
         solver_name=solver_name,
