@@ -29,6 +29,8 @@ battery: true
 elastic_intercept: 2000 # €/MWh
 voll_price: 2000 # €/MWh
 
+reserve: 0
+
 elastic_pwl_params:
   default:
     intercept: [8000, 400, 200]

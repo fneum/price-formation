@@ -235,6 +235,7 @@ def add_hydrogen(n, config, tech_data):
         bus1="electricity",
         carrier="hydrogen fuel cell",
         p_nom_extendable=True,
+        p_nom_min=config["reserve"],
         efficiency=tech_data.at["fuel cell", "efficiency"],
         capital_cost=tech_data.at["fuel cell", "capital_cost"]
         * tech_data.at["fuel cell", "efficiency"],
