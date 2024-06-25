@@ -24,6 +24,8 @@ def load_technology_data(fn, defaults, overrides=False, years=1):
 
     df = df.value.unstack()[defaults.keys()].fillna(defaults)
 
+    df.loc["OCGT", "fuel"] = df.loc["gas", "fuel"]
+
     if overrides:
         for tech, tech_overrides in overrides.items():
             for attr, value in tech_overrides.items():
@@ -35,6 +37,8 @@ def load_technology_data(fn, defaults, overrides=False, years=1):
     )
 
     df["capital_cost"] = (annuity_factor + df["FOM"] / 100) * df["investment"]
+
+    df["marginal_cost"] = df["VOM"] + df["fuel"] / df["efficiency"]
 
     return df
 
@@ -160,6 +164,22 @@ def add_wind(n, config, tech_data, p_max_pu):
         p_nom_extendable=True,
         marginal_cost=0.2,  # Small cost to prefer curtailment to destroying energy in storage, solar curtails before wind
         capital_cost=tech_data.at["onwind", "capital_cost"],
+    )
+
+
+def add_dispatchable(n, config, tech_data):
+    if not config["dispatchable"]:
+        return
+
+    n.add(
+        "Generator",
+        "dispatchable",
+        bus="electricity",
+        carrier="dispatchable",
+        p_nom=config["dispatchable"],
+        efficiency=tech_data.at["OCGT", "efficiency"],
+        marginal_cost=tech_data.at["OCGT", "marginal_cost"],
+        capital_cost=tech_data.at["OCGT", "capital_cost"],
     )
 
 
@@ -300,6 +320,7 @@ if __name__ == "__main__":
     add_load(n, snakemake.config)
     add_solar(n, snakemake.config, tech_data, solar_cf)
     add_wind(n, snakemake.config, tech_data, onwind_cf)
+    add_dispatchable(n, snakemake.config, tech_data)
     add_battery(n, snakemake.config, tech_data)
     add_hydrogen(n, snakemake.config, tech_data)
 

@@ -26,6 +26,8 @@ solar: true
 hydrogen: true
 battery: true
 
+dispatchable: false
+
 elastic_intercept: 2000 # €/MWh
 voll_price: 2000 # €/MWh
 
@@ -61,6 +63,7 @@ technology_data:
     investment: 0
     lifetime: 25
     discount rate: 0.07
+    fuel: 0
   overrides:
     electrolysis:
       investment: 1500 # €/kW
