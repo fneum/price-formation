@@ -69,14 +69,13 @@ def add_load(n, config):
         logger.info("Adding demand with VOLL.")
         n.add(
             "Generator",
-            "load",
+            "load-shedding",
             bus="electricity",
             carrier="load",
             marginal_cost=config["voll_price"],
-            p_max_pu=0,
-            p_min_pu=-1,
             p_nom=config["load"],
         )
+        n.add("Load", "load", bus="electricity", carrier="load", p_set=config["load"])
     if config["elastic"]:
         logger.info("Adding elastic demand.")
         n.add(
