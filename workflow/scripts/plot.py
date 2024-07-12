@@ -400,10 +400,10 @@ def plot_supply_demand_curve(n, sns):
 
     ylim_max = snakemake.config["supply_demand_curve"]["ylim_max"]
 
-    if "load" in n.generators.index:
-        mc = n.generators.at["load", "marginal_cost"]
-        mc2 = n.generators.at["load", "marginal_cost_quadratic"]
-        p_nom = n.generators.at["load", "p_nom"]
+    if "load-shedding" in n.generators.index:
+        mc = n.generators.at["load-shedding", "marginal_cost"]
+        mc2 = n.generators.at["load-shedding", "marginal_cost_quadratic"]
+        p_nom = n.generators.at["load-shedding", "p_nom"]
 
         d = np.arange(0, p_nom, res)
 
@@ -612,7 +612,7 @@ def get_metrics(n):
         Q2 = n.generators_t.p["load-shedding"] ** 2
         U += constant - b / 2 * Q2 @ weightings
     if n.meta["voll"]:
-        Q = -n.generators_t.p["load"]
+        Q = -n.generators_t.p["load-shedding"]
         U += n.meta["voll_price"] * Q @ weightings
     if n.meta["inelastic"]:
         U = pd.NA
