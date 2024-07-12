@@ -89,7 +89,7 @@ cluster-sync:
 solver:
   name: gurobi
   options: gurobi-default
-  threads: 8
+  threads: 12
   mem_mb: 24000
   runtime: 12h
 
@@ -145,21 +145,23 @@ export_to_netcdf:
     least_significant_digit: 5
 
 colors:
-  wind: "#2b90d4"
+  total: "#555555"
+  wind: "#0056B8"
   wind curtailed: "#add4ef"
-  solar: "#d6b829"
+  solar: "#FFD800"
   solar curtailed: "#e8d786"
-  battery: "#758a85"
-  battery storage: "#758a85"
-  battery charger: "#758a85"
-  battery discharger: "#758a85"
-  hydrogen: "#ce317c"
-  hydrogen fuel cell: "#e16d26"
-  hydrogen electrolyser: "#ce317c"
-  hydrogen underground storage: "#9723dc"
-  hydrogen storage: "#9723dc"
-  electricity: "#7eae51"
-  load: "#7eae51"
+  battery: "#6B8F80"
+  battery storage: "#6B8F80"
+  battery charger: "#6B8F80"
+  battery discharger: "#6B8F80"
+  battery dis-/charging: "#67A345"
+  hydrogen: "#B8326A"
+  hydrogen fuel cell: "#E17B36"
+  hydrogen electrolyser: "#B83C69"
+  hydrogen underground storage: "#A05AA7"
+  hydrogen storage: "#A05AA7"
+  electricity: "#6BA34A"
+  load: "#6BA34A"
   load-shedding: "#bac7ad"
 
 color_palette: colorblind
