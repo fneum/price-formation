@@ -193,8 +193,8 @@ rule receive:
 
 rule all:
     input:
-        expand(rules.plot_myopic_dispatch.output[0], **config["scenario"]),
-        expand(rules.plot.output[0], **config["scenario"]),
+        expand(rules.plot_myopic_dispatch.output[-1], **config["scenario"]),
+        expand(rules.plot.output[-1], **config["scenario"]),
     default_target: True
 
 
