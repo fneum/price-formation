@@ -286,7 +286,7 @@ def plot_state_of_charge(n):
 
 
 def plot_hydrogen_bidding(n):
-    if not "hydrogen" in n.buses.index:
+    if "hydrogen" not in n.buses.index:
         fig, ax = plt.subplots()
         plt.savefig(snakemake.output.hydrogen_bidding)
         return
@@ -321,7 +321,7 @@ def plot_hydrogen_bidding(n):
 
 
 def plot_battery_bidding(n):
-    if not "battery" in n.buses.index:
+    if "battery" not in n.buses.index:
         fig, ax = plt.subplots()
         plt.savefig(snakemake.output.battery_bidding)
         return
@@ -583,21 +583,32 @@ def get_metrics(n):
     metrics["energy-served"] = -energy_balance["load"]
     metrics["average-load-served"] = -energy_balance["load"] * 1e6 / weightings.sum()
     metrics["primary-energy"] = energy_balance.filter(regex="solar|wind|dispatchable").sum()
-    metrics["wind-share"] = energy_balance["wind"] / metrics["primary-energy"]
-    metrics["solar-share"] = energy_balance["solar"] / metrics["primary-energy"]
+    metrics["wind-share"] = energy_balance["wind"] / metrics["primary-energy"] * 100
+    metrics["solar-share"] = energy_balance["solar"] / metrics["primary-energy"] * 100
     metrics["dispatchable-share"] = energy_balance.filter(like='dispatchable').sum() / metrics["primary-energy"]
 
     market_values = n.statistics.market_value()
     metrics["wind-lcoe"] = market_values.loc["Generator", "wind"]
     metrics["solar-lcoe"] = market_values.loc["Generator", "solar"]
 
-    metrics["wind-cf"] = n.generators_t.p_max_pu["wind"].mean()
-    metrics["solar-cf"] = n.generators_t.p_max_pu["solar"].mean()
+    metrics["wind-cf"] = n.generators_t.p_max_pu["wind"].mean() * 100
+    metrics["solar-cf"] = n.generators_t.p_max_pu["solar"].mean() * 100
 
     metrics["hydrogen-consumed"] = n.links_t.p0["hydrogen fuel cell"] @ weightings / 1e6
 
+    if "load" in n.generators.index:
+        metrics["peak-load-shedding"] = n.generators.at["load", "p_nom"] + n.generators_t.p["load"].max()
+    else:
+        metrics["peak-load-shedding"] = n.generators_t.p.filter(like="load-shedding").sum(axis=1).max()
+
     # capacities
     capacities = n.statistics.optimal_capacity().groupby("carrier").sum().drop("load", errors='ignore')
+    capacities["hydrogen fuel cell"] *= n.links.at["hydrogen fuel cell", "efficiency"] # MWe
+    capacities["hydrogen storage"] /= 1e3 # GWh
+    if "battery discharger" in capacities.index:
+        capacities["battery discharger"] *= n.links.at["battery discharger", "efficiency"] # MWe
+    if "battery storage" in capacities.index:
+        capacities["battery storage"] /= 1e3 # GWh
     capacities.index = ["p_nom_opt-" + i.replace(" ", "-") for i in capacities.index]
     metrics = pd.concat([metrics, capacities])
 
@@ -619,7 +630,7 @@ def get_metrics(n):
     curtailment_twh = n.statistics.curtailment().filter(regex="solar|wind").sum() / 1e6
     metrics["curtailment"] = curtailment_twh / (
         curtailment_twh + energy_balance.filter(regex="solar|wind").sum()
-    )
+    ) * 100
 
     # multiple if statements since mixing of voll and elastic is possible
     U = 0.0
