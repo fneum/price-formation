@@ -629,10 +629,10 @@ def get_metrics(n):
             zip(pwl["intercept"], pwl["slope"], pwl["nominal"])
         ):
             Q = n.generators_t.p[f"load-shedding-segment-{i}"]
-            constant = a * load * weightings.sum()
+            constant = (a * load - b * load / 2) * weightings.sum()
             intersection = a - b * load
-            load_shedding_cost = intersection * Q - b / 2 * Q**2
-            U += constant - load_shedding_cost @     weightings
+            load_shedding_cost = intersection * Q + b / 2 * Q**2
+            U += constant - load_shedding_cost @ weightings
     if n.meta["elastic"]:
         a = n.meta["elastic_intercept"]
         b = n.meta["elastic_intercept"] / n.meta["load"]
