@@ -33,6 +33,7 @@ researchdata.reading.ac.uk
 notes
 resources
 results
+figures
 
 slides
 
@@ -41,5 +42,3 @@ workflow/scripts/code_snippets.py
 ARCHIVE
 
 data
-
-config/config.*.yaml

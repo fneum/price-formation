@@ -1,8 +1,8 @@
 cff-version: 1.2.0
 message: "price-formation"
-title: "Price Formation with 100% VRE"
+title: "Price formation without fuel costs: the interaction of elastic demand with storage bidding"
 repository: https://github.com/fneum/price-formation
-version: 0.0.1
+version: 0.1.0
 doi: "N/A"
 date-released: "N/A"
 license: MIT

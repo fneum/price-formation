@@ -22,7 +22,4 @@ repos:
   rev: v0.10.1
   hooks:
   - id: snakefmt
-# - repo: https://github.com/fsfe/reuse-tool
-#   rev: latest
-#   hooks:
-#   - id: reuse
+
