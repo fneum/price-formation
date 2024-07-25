@@ -1,0 +1,80 @@
+run: "20240506-70a"
+
+scenario:
+  lt:
+  - country+DE-inelastic+true
+  - country+DE-voll+true
+  - country+DE-elastic+true-elastic_intercept+200
+  - country+DE-elastic+true-elastic_intercept+2000
+  - country+DE-elastic_pwl+default
+  - country+DE-elastic_pwl+higher
+  - country+DE-elastic_pwl+lower
+  - country+DE-elastic_pwl+default-zero_cost_storage+true-battery+false
+  - country+ES-inelastic+true
+  - country+ES-voll+true
+  - country+ES-elastic+true-elastic_intercept+200
+  - country+ES-elastic+true-elastic_intercept+2000
+  - country+ES-elastic_pwl+default
+  - country+ES-elastic_pwl+higher
+  - country+ES-elastic_pwl+lower
+  - country+ES-elastic_pwl+default-zero_cost_storage+true-battery+false
+  - country+UK-inelastic+true
+  - country+UK-voll+true
+  - country+UK-elastic+true-elastic_intercept+200
+  - country+UK-elastic+true-elastic_intercept+2000
+  - country+UK-elastic_pwl+default
+  - country+UK-elastic_pwl+higher
+  - country+UK-elastic_pwl+lower
+  - country+UK-elastic_pwl+default-zero_cost_storage+true-battery+false
+  - country+IE-inelastic+true
+  - country+IE-voll+true
+  - country+IE-elastic+true-elastic_intercept+200
+  - country+IE-elastic+true-elastic_intercept+2000
+  - country+IE-elastic_pwl+default
+  - country+IE-elastic_pwl+higher
+  - country+IE-elastic_pwl+lower
+  - country+IE-elastic_pwl+default-zero_cost_storage+true-battery+false
+  st:
+  - perfect_foresight+true
+  - perfect_foresight+true-cyclic+true
+  - perfect_foresight+true-hydrogen_bid+series-battery_bid+series
+  - perfect_foresight+true-hydrogen_bid+series-battery_bid+series-cyclic+true
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+0.8
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+0.9
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+0.95
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+0.99
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+1.01
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+1.05
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+1.1
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true-perturbation+1.2
+  - horizon+48-overlap+24
+  - horizon+96-overlap+48
+  - horizon+96-overlap+48-perturbation+0.8
+  - horizon+96-overlap+48-perturbation+0.9
+  - horizon+96-overlap+48-perturbation+0.95
+  - horizon+96-overlap+48-perturbation+0.99
+  - horizon+96-overlap+48-perturbation+1.01
+  - horizon+96-overlap+48-perturbation+1.05
+  - horizon+96-overlap+48-perturbation+1.1
+  - horizon+96-overlap+48-perturbation+1.2
+  - horizon+96-overlap+48-hydrogen_bid+0-battery_bid+0
+
+snapshots:
+  start: "1951-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 48000
+  threads: 32
+  runtime: 12h
+  options: gurobi-default
+
+myopic_solver:
+  mem_mb: 16000
+  runtime: 24h
+
+
+solver_options:
+  gurobi-numeric:
+    threads: 32

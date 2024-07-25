@@ -1,0 +1,45 @@
+run: "20240625-reserve"
+
+scenario:
+  lt:
+  - country+DE-voll+true-reserve+0
+  - country+DE-voll+true-reserve+20
+  - country+DE-voll+true-reserve+40
+  - country+DE-voll+true-reserve+60
+  - country+DE-voll+true-reserve+80
+  - country+DE-voll+true-reserve+100
+  - country+DE-voll+true-reserve+120
+  - country+DE-voll+true-reserve+140
+  - country+DE-voll+true-reserve+160
+  - country+DE-voll+true-reserve+180
+  - country+DE-voll+true-reserve+200
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+0
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+20
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+40
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+60
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+80
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+100
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+120
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+140
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+160
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+180
+  - country+DE-elastic+true-elastic_intercept+2000-reserve+200
+  st:
+  - perfect_foresight+true
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0
+  # - horizon+96-overlap+48
+
+snapshots:
+  start: "2001-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 24000
+  threads: 16
+  runtime: 6h
+  options: gurobi-default
+
+myopic_solver:
+  mem_mb: 8000
+  runtime: 12h

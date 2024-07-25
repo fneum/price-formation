@@ -1,0 +1,32 @@
+run: "20240625-dispatchable"
+
+scenario:
+  lt:
+  - country+DE-voll+true-dispatchable+0
+  - country+DE-voll+true-dispatchable+10
+  - country+DE-voll+true-dispatchable+20
+  - country+DE-voll+true-dispatchable+50
+  - country+DE-voll+true-dispatchable+100
+  - country+DE-elastic+true-elastic_intercept+2000-dispatchable+0
+  - country+DE-elastic+true-elastic_intercept+2000-dispatchable+10
+  - country+DE-elastic+true-elastic_intercept+2000-dispatchable+20
+  - country+DE-elastic+true-elastic_intercept+2000-dispatchable+50
+  - country+DE-elastic+true-elastic_intercept+2000-dispatchable+100
+  st:
+  - perfect_foresight+true
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true
+  - horizon+96-overlap+48
+
+snapshots:
+  start: "2001-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 24000
+  threads: 16
+  runtime: 6h
+  options: gurobi-default
+
+myopic_solver:
+  mem_mb: 8000
+  runtime: 12h

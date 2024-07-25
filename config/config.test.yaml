@@ -1,0 +1,12 @@
+run: "test"
+
+scenario:
+  lt:
+  - country+DE-elastic_pwl+default
+  - country+DE-inelastic+true
+  - country+DE-voll+true
+  st: []
+
+snapshots:
+  start: "2020-01-01"
+  end: "2021-01-01"

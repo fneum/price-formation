@@ -1,0 +1,59 @@
+run: "20240506-35a-35a"
+
+scenario:
+  lt:
+  - country+DE-number_years+35-inelastic+true
+  - country+DE-number_years+35-voll+true
+  - country+DE-number_years+35-elastic_pwl+default
+  - country+DE-number_years+35-elastic_pwl+higher
+  - country+DE-number_years+35-elastic_pwl+lower
+  - country+DE-number_years+35-elastic+true-elastic_intercept+2000
+  - country+DE-number_years+35-elastic+true-elastic_intercept+200
+  - country+ES-number_years+35-inelastic+true
+  - country+ES-number_years+35-voll+true
+  - country+ES-number_years+35-elastic_pwl+default
+  - country+ES-number_years+35-elastic_pwl+higher
+  - country+ES-number_years+35-elastic_pwl+lower
+  - country+ES-number_years+35-elastic+true-elastic_intercept+2000
+  - country+ES-number_years+35-elastic+true-elastic_intercept+200
+  - country+UK-number_years+35-inelastic+true
+  - country+UK-number_years+35-voll+true
+  - country+UK-number_years+35-elastic_pwl+default
+  - country+UK-number_years+35-elastic_pwl+higher
+  - country+UK-number_years+35-elastic_pwl+lower
+  - country+UK-number_years+35-elastic+true-elastic_intercept+2000
+  - country+UK-number_years+35-elastic+true-elastic_intercept+200
+  - country+IE-number_years+35-inelastic+true
+  - country+IE-number_years+35-voll+true
+  - country+IE-number_years+35-elastic_pwl+default
+  - country+IE-number_years+35-elastic_pwl+higher
+  - country+IE-number_years+35-elastic_pwl+lower
+  - country+IE-number_years+35-elastic+true-elastic_intercept+2000
+  - country+IE-number_years+35-elastic+true-elastic_intercept+200
+  st:
+  - number_years+35-perfect_foresight+true
+  - number_years+35-perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true
+  - number_years+35-perfect_foresight+true-hydrogen_bid+0-battery_bid+0
+  - number_years+35-horizon+48-overlap+24
+  - number_years+35-horizon+96-overlap+48
+  - number_years+35-horizon+96-overlap+48-perturbation+0.8
+  - number_years+35-horizon+96-overlap+48-perturbation+0.9
+  - number_years+35-horizon+96-overlap+48-perturbation+0.95
+  - number_years+35-horizon+96-overlap+48-perturbation+0.99
+  - number_years+35-horizon+96-overlap+48-perturbation+1.01
+  - number_years+35-horizon+96-overlap+48-perturbation+1.05
+  - number_years+35-horizon+96-overlap+48-perturbation+1.1
+  - number_years+35-horizon+96-overlap+48-perturbation+1.2
+  - number_years+35-horizon+96-overlap+48-hydrogen_bid+0-battery_bid+0
+
+snapshots:
+  start: "1951-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 12000
+  walltime: "04:00:00"
+
+myopic_solver:
+  mem_mb: 8000
+  walltime: "12:00:00"
