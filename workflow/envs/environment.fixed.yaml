@@ -1,9 +1,8 @@
 name: price-formation
 channels:
+  - conda-forge
   - bioconda
   - gurobi
-  - http://conda.anaconda.org/gurobi
-  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1
@@ -465,4 +464,3 @@ dependencies:
   - zstd=1.5.5
   - pip:
       - highspy==1.5.3
-prefix: /home/fneum/miniconda3/envs/price-formation

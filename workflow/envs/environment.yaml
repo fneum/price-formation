@@ -9,6 +9,7 @@ dependencies:
 - pypsa==0.27.1
 - linopy>=0.3.8
 - snakemake-minimal>=8.5
+- gurobi>=11
 - pandas
 - numpy
 - xarray
@@ -17,7 +18,6 @@ dependencies:
 - country_converter
 - graphviz
 - ipython
-- gurobi
 - ipykernel
 - seaborn
 - jupyterlab
