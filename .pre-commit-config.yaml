@@ -22,4 +22,3 @@ repos:
   rev: v0.10.1
   hooks:
   - id: snakefmt
-

@@ -11,6 +11,7 @@ from pypsa.descriptors import get_switchable_as_dense as as_dense
 
 NDIGITS = 3
 
+
 def set_xticks(ax, index):
     major_tick_positions = [
         index.get_loc(date) for date in index if date == datetime(date.year, 1, 1, 0)
@@ -571,21 +572,30 @@ def plot_cost_recovery(n, segments="pricebands"):
 
 def get_metrics(n):
 
-    energy_balance = n.statistics.energy_balance().groupby("carrier").sum() / 1e6 # TWh
+    energy_balance = n.statistics.energy_balance().groupby("carrier").sum() / 1e6  # TWh
 
     weightings = n.snapshot_weightings.generators
 
     metrics = pd.Series()
     # for opex, do not consider load shedding generators and heuristic storage bids
-    metrics["opex"] = n.statistics.opex(comps={"Generator", "Link"}).drop("load", level=1, errors="ignore").sum() / 1e9
+    metrics["opex"] = (
+        n.statistics.opex(comps={"Generator", "Link"})
+        .drop("load", level=1, errors="ignore")
+        .sum()
+        / 1e9
+    )
     metrics["capex"] = n.statistics.capex().sum() / 1e9
     metrics["system-costs"] = metrics["capex"] + metrics["opex"]
     metrics["energy-served"] = -energy_balance["load"]
     metrics["average-load-served"] = -energy_balance["load"] * 1e6 / weightings.sum()
-    metrics["primary-energy"] = energy_balance.filter(regex="solar|wind|dispatchable").sum()
+    metrics["primary-energy"] = energy_balance.filter(
+        regex="solar|wind|dispatchable"
+    ).sum()
     metrics["wind-share"] = energy_balance["wind"] / metrics["primary-energy"] * 100
     metrics["solar-share"] = energy_balance["solar"] / metrics["primary-energy"] * 100
-    metrics["dispatchable-share"] = energy_balance.filter(like='dispatchable').sum() / metrics["primary-energy"]
+    metrics["dispatchable-share"] = (
+        energy_balance.filter(like="dispatchable").sum() / metrics["primary-energy"]
+    )
 
     market_values = n.statistics.market_value()
     metrics["wind-lcoe"] = market_values.loc["Generator", "wind"]
@@ -597,23 +607,38 @@ def get_metrics(n):
     metrics["hydrogen-consumed"] = n.links_t.p0["hydrogen fuel cell"] @ weightings / 1e6
 
     if "load" in n.generators.index:
-        metrics["peak-load-shedding"] = n.generators.at["load", "p_nom"] + n.generators_t.p["load"].max()
+        metrics["peak-load-shedding"] = (
+            n.generators.at["load", "p_nom"] + n.generators_t.p["load"].max()
+        )
     else:
-        metrics["peak-load-shedding"] = n.generators_t.p.filter(like="load-shedding").sum(axis=1).max()
+        metrics["peak-load-shedding"] = (
+            n.generators_t.p.filter(like="load-shedding").sum(axis=1).max()
+        )
 
     # capacities
-    capacities = n.statistics.optimal_capacity().groupby("carrier").sum().drop("load", errors='ignore')
-    capacities["hydrogen fuel cell"] *= n.links.at["hydrogen fuel cell", "efficiency"] # MWe
-    capacities["hydrogen storage"] /= 1e3 # GWh
+    capacities = (
+        n.statistics.optimal_capacity()
+        .groupby("carrier")
+        .sum()
+        .drop("load", errors="ignore")
+    )
+    capacities["hydrogen fuel cell"] *= n.links.at[
+        "hydrogen fuel cell", "efficiency"
+    ]  # MWe
+    capacities["hydrogen storage"] /= 1e3  # GWh
     if "battery discharger" in capacities.index:
-        capacities["battery discharger"] *= n.links.at["battery discharger", "efficiency"] # MWe
+        capacities["battery discharger"] *= n.links.at[
+            "battery discharger", "efficiency"
+        ]  # MWe
     if "battery storage" in capacities.index:
-        capacities["battery storage"] /= 1e3 # GWh
+        capacities["battery storage"] /= 1e3  # GWh
     capacities.index = ["p_nom_opt-" + i.replace(" ", "-") for i in capacities.index]
     metrics = pd.concat([metrics, capacities])
 
     # time-weighted average prices
-    metrics["average-electricity-price"] = n.buses_t.marginal_price["electricity"].mean()
+    metrics["average-electricity-price"] = n.buses_t.marginal_price[
+        "electricity"
+    ].mean()
     metrics["average-hydrogen-price"] = n.buses_t.marginal_price["hydrogen"].mean()
     metrics["std-electricity-price"] = n.buses_t.marginal_price["electricity"].std()
     metrics["std-hydrogen-price"] = n.buses_t.marginal_price["hydrogen"].std()
@@ -628,9 +653,11 @@ def get_metrics(n):
     metrics["std-battery-msv"] = battery_msv.std()
 
     curtailment_twh = n.statistics.curtailment().filter(regex="solar|wind").sum() / 1e6
-    metrics["curtailment"] = curtailment_twh / (
-        curtailment_twh + energy_balance.filter(regex="solar|wind").sum()
-    ) * 100
+    metrics["curtailment"] = (
+        curtailment_twh
+        / (curtailment_twh + energy_balance.filter(regex="solar|wind").sum())
+        * 100
+    )
 
     # multiple if statements since mixing of voll and elastic is possible
     U = 0.0
@@ -663,7 +690,9 @@ def get_metrics(n):
 
     metrics["welfare"] = metrics["utility"] - metrics["system-costs"]
 
-    metrics["average-costs"] = metrics["system-costs"] * 1e3 / metrics["energy-served"] # €/MWh
+    metrics["average-costs"] = (
+        metrics["system-costs"] * 1e3 / metrics["energy-served"]
+    )  # €/MWh
 
     crf = get_cost_recovery(n).sum(axis=1).rename(index=lambda x: "cost-recovery " + x)
     metrics = pd.concat([metrics, crf])
