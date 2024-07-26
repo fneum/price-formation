@@ -87,6 +87,17 @@ On HPC cluster, run:
 snakemake -call --profile slurm --use-conda --conda-frontend conda
 ```
 
+## Compress Results
+
+Use `tar` to run (excluding report directory):
+
+```sh
+tar -cJf price-formation-results.tar.xz \
+    config data figures results resources workflow \
+    .gitignore .pre-commit-config.yaml .syncignore-receive \
+    .syncignore-receive CITATION.cff LICENSE matplotlibrc README.md
+```
+
 ## License
 
 The code in this repository is MIT licensed, see [`./LICENSE`](`./LICENSE`).
