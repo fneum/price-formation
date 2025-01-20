@@ -2,7 +2,7 @@
 
 **Link to preprint:** https://arxiv.org/TBC *(in preparation)*
 
-**Link to data:** https://zenodo.org/TBC *(in preparation)*
+**Link to data:** https://zenodo.org/records/12759248
 
 ## Abstract
 
