@@ -375,7 +375,7 @@ def plot_energy_balance(n):
 
     # protect against numerical inaccuracies (e.g. small negative values in positive column)
     eb = eb.apply(
-        lambda c: c.clip(lower=0) if (c >= 0).mean() > 0.5 else c.clip(upper=0)
+        lambda c: c.clip(lower=0) if (c >= 0).mean() > 0.6 else c.clip(upper=0)
     )
 
     fig, ax = plt.subplots()

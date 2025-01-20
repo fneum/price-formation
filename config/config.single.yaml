@@ -7,6 +7,12 @@ scenario:
   - country+DE-elastic_pwl+default
   - country+DE-elastic_pwl+lower
   - country+DE-elastic_pwl+higher
+  - country+DE-elastic_pwl+default-cross_elasticity+default
+  - country+DE-elastic_pwl+default-cross_elasticity+higher
+  - country+DE-elastic_pwl+default-cross_elasticity+lower
+  - country+DE-elastic_pwl+default-cross_elasticity+longer
+  - country+DE-elastic_pwl+default-cross_elasticity+shorter
+  - country+DE-elastic_pwl+default-cross_elasticity+lowest
   - country+DE-elastic+true-elastic_intercept+200
   - country+DE-elastic+true-elastic_intercept+2000
   - country+DE-elastic+true-elastic_intercept+20000
@@ -25,6 +31,11 @@ scenario:
   - country+ES-elastic_pwl+default
   - country+ES-elastic_pwl+lower
   - country+ES-elastic_pwl+higher
+  - country+ES-elastic_pwl+default-cross_elasticity+higher
+  - country+ES-elastic_pwl+default-cross_elasticity+lower
+  - country+ES-elastic_pwl+default-cross_elasticity+longer
+  - country+ES-elastic_pwl+default-cross_elasticity+shorter
+  - country+ES-elastic_pwl+default-cross_elasticity+lowest
   - country+ES-elastic+true-elastic_intercept+200
   - country+ES-elastic+true-elastic_intercept+2000
   - country+ES-elastic+true-elastic_intercept+20000
@@ -43,6 +54,11 @@ scenario:
   - country+UK-elastic_pwl+default
   - country+UK-elastic_pwl+lower
   - country+UK-elastic_pwl+higher
+  - country+UK-elastic_pwl+default-cross_elasticity+higher
+  - country+UK-elastic_pwl+default-cross_elasticity+lower
+  - country+UK-elastic_pwl+default-cross_elasticity+longer
+  - country+UK-elastic_pwl+default-cross_elasticity+shorter
+  - country+UK-elastic_pwl+default-cross_elasticity+lowest
   - country+UK-elastic+true-elastic_intercept+200
   - country+UK-elastic+true-elastic_intercept+2000
   - country+UK-elastic+true-elastic_intercept+20000
@@ -61,6 +77,11 @@ scenario:
   - country+IE-elastic_pwl+default
   - country+IE-elastic_pwl+lower
   - country+IE-elastic_pwl+higher
+  - country+IE-elastic_pwl+default-cross_elasticity+higher
+  - country+IE-elastic_pwl+default-cross_elasticity+lower
+  - country+IE-elastic_pwl+default-cross_elasticity+longer
+  - country+IE-elastic_pwl+default-cross_elasticity+shorter
+  - country+IE-elastic_pwl+default-cross_elasticity+lowest
   - country+IE-elastic+true-elastic_intercept+200
   - country+IE-elastic+true-elastic_intercept+2000
   - country+IE-elastic+true-elastic_intercept+20000

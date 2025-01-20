@@ -61,6 +61,47 @@ def add_battery_constraints(n, sns):
     n.model.add_constraints(lhs == 0, name="Link-charger_ratio")
 
 
+def add_cross_elastic_terms(n, sns):
+    """
+    Add cross-elasticity terms to the objective function.
+    """
+    scenario = n.meta["cross_elasticity"]
+    if not scenario:
+        return
+    extent = n.meta["cross_elasticity_params"][scenario]["extent"]
+    divisor = n.meta["cross_elasticity_params"][scenario]["divisor"]
+    myopic_and_cyclic = n.meta.get("myopic_and_cyclic", False)
+
+    logger.info(
+        f"Adding cross-elasticity terms ({scenario}: {extent}, {divisor}) to the objective function."
+    )
+
+    load = n.generators.query("carrier == 'load'")
+    b = load.marginal_cost_quadratic * 2  # marginal_cost_quadratic = b / 2
+    gamma = b / divisor
+
+    p_t = n.model["Generator-p"].loc[:, load.index]
+    d_gamma_half = 0.5 * load.p_nom * gamma
+    for k in range(-extent, extent + 1):
+        if k == 0:
+            continue
+        p_k = p_t.roll(snapshot=k)
+        snapshots = p_t.indexes["snapshot"]
+        if not myopic_and_cyclic:
+            snapshots = snapshots[:k] if k < 0 else snapshots[k:]
+        n.model.objective += (
+            p_t * d_gamma_half + p_k * d_gamma_half - p_t * p_k * 0.5 * gamma
+        ).sel(snapshot=snapshots).sum()
+
+
+def add_extra_functionality(n, sns):
+    """
+    Add extra functionality to the network before solving.
+    """
+    add_battery_constraints(n, sns)
+    add_cross_elastic_terms(n, sns)
+
+
 def solve_network(n, config, attempt=1):
 
     solver_name = config["solver"]["name"]
@@ -83,7 +124,7 @@ def solve_network(n, config, attempt=1):
         solver_name=solver_name,
         solver_options=solver_options,
         assign_all_duals=True,
-        extra_functionality=add_battery_constraints,
+        extra_functionality=add_extra_functionality,
     )
 
     if status != "ok":

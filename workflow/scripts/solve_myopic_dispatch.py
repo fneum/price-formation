@@ -4,7 +4,7 @@ import logging
 import pypsa
 from helpers import set_scenario_config
 from pypsa.descriptors import nominal_attrs
-from solve import set_snapshots
+from solve import set_snapshots, add_cross_elastic_terms
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,9 @@ if __name__ == "__main__":
         elif isinstance(battery_bid, (float, int)):
             n.stores.at["battery storage", "marginal_cost"] = battery_bid
 
-    n.stores.e_cyclic = snakemake.config["myopic"]["cyclic"]
+    cyclic = snakemake.config["myopic"]["cyclic"]
+    n.stores.e_cyclic = cyclic
+    n.meta["myopic_and_cyclic"] = cyclic
 
     perturbation = snakemake.config["myopic"]["perturbation"]
     if perturbation != 1:
@@ -100,6 +102,7 @@ if __name__ == "__main__":
             solver_name=solver_name,
             solver_options=solver_options,
             assign_all_duals=True,
+            extra_functionality=add_cross_elastic_terms,
         )
     else:
         with contextlib.ExitStack() as stack:
@@ -118,6 +121,7 @@ if __name__ == "__main__":
                 horizon=snakemake.config["myopic"]["horizon"],
                 overlap=snakemake.config["myopic"]["overlap"],
                 env=env,
+                extra_functionality=add_cross_elastic_terms,
             )
 
     export_kwargs = snakemake.config["export_to_netcdf"]

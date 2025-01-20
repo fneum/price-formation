@@ -47,6 +47,28 @@ elastic_pwl_params:
     slope: [40, 20, 10]
     nominal: [95, 5, 10]
 
+cross_elasticity: false
+
+cross_elasticity_params:
+  default:
+    extent: 4 # hours
+    divisor: 16 # divisor of slope / b
+  higher:
+    extent: 4
+    divisor: 8
+  lower:
+    extent: 4
+    divisor: 24
+  longer:
+    extent: 8
+    divisor: 16
+  shorter:
+    extent: 2
+    divisor: 16
+  lowest:
+    extent: 4
+    divisor: 64
+
 number_years: false
 random_years: true
 fixed_year: false

@@ -1,0 +1,54 @@
+run: "20250120-70a-cross"
+
+scenario:
+  lt:
+  - country+DE-elastic_pwl+default
+  - country+DE-elastic_pwl+default-cross_elasticity+default
+  - country+DE-elastic_pwl+default-cross_elasticity+higher
+  - country+DE-elastic_pwl+default-cross_elasticity+lower
+  - country+DE-elastic_pwl+default-cross_elasticity+longer
+  - country+DE-elastic_pwl+default-cross_elasticity+shorter
+  - country+DE-elastic_pwl+default-cross_elasticity+lowest
+  - country+UK-elastic_pwl+default
+  - country+UK-elastic_pwl+default-cross_elasticity+default
+  - country+UK-elastic_pwl+default-cross_elasticity+higher
+  - country+UK-elastic_pwl+default-cross_elasticity+lower
+  - country+UK-elastic_pwl+default-cross_elasticity+longer
+  - country+UK-elastic_pwl+default-cross_elasticity+shorter
+  - country+UK-elastic_pwl+default-cross_elasticity+lowest
+  - country+ES-elastic_pwl+default
+  - country+ES-elastic_pwl+default-cross_elasticity+default
+  - country+ES-elastic_pwl+default-cross_elasticity+higher
+  - country+ES-elastic_pwl+default-cross_elasticity+lower
+  - country+ES-elastic_pwl+default-cross_elasticity+longer
+  - country+ES-elastic_pwl+default-cross_elasticity+shorter
+  - country+ES-elastic_pwl+default-cross_elasticity+lowest
+  - country+IE-elastic_pwl+default
+  - country+IE-elastic_pwl+default-cross_elasticity+default
+  - country+IE-elastic_pwl+default-cross_elasticity+higher
+  - country+IE-elastic_pwl+default-cross_elasticity+lower
+  - country+IE-elastic_pwl+default-cross_elasticity+longer
+  - country+IE-elastic_pwl+default-cross_elasticity+shorter
+  - country+IE-elastic_pwl+default-cross_elasticity+lowest
+  st:
+  - perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true
+  # - horizon+96-overlap+48
+
+snapshots:
+  start: "1951-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 54000
+  threads: 32
+  runtime: 18h
+  options: gurobi-default
+
+myopic_solver:
+  mem_mb: 16000
+  runtime: 24h
+
+
+solver_options:
+  gurobi-numeric:
+    threads: 32
