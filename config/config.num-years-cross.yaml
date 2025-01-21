@@ -1,0 +1,24 @@
+run: "20250121-num-years-cross"
+
+scenario:
+  lt: 
+  - country+DE-number_years+1-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+2-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+4-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+8-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+16-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+32-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+48-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+64-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+70-elastic_pwl+default-cross_elasticity+default
+  st: []
+
+snapshots:
+  start: "1951-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 48000
+  walltime: 24h
+  threads: 16
+  options: gurobi-default

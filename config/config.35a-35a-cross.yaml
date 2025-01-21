@@ -1,0 +1,30 @@
+run: "20250121-35a-35a-cross"
+
+scenario:
+  lt:
+  - country+DE-number_years+35-elastic_pwl+default
+  - country+DE-number_years+35-elastic_pwl+default-cross_elasticity+default
+  - country+DE-number_years+35-elastic_pwl+default-cross_elasticity+lowest
+  - country+ES-number_years+35-elastic_pwl+default
+  - country+ES-number_years+35-elastic_pwl+default-cross_elasticity+default
+  - country+ES-number_years+35-elastic_pwl+default-cross_elasticity+lowest
+  - country+UK-number_years+35-elastic_pwl+default
+  - country+UK-number_years+35-elastic_pwl+default-cross_elasticity+default
+  - country+UK-number_years+35-elastic_pwl+default-cross_elasticity+lowest
+  st:
+  - number_years+35-perfect_foresight+true-hydrogen_bid+0-battery_bid+0-cyclic+true
+  - number_years+35-horizon+96-overlap+48
+  - number_years+35-horizon+96-overlap+48-perturbation+0.95
+  - number_years+35-horizon+96-overlap+48-perturbation+1.05
+
+snapshots:
+  start: "1951-01-01"
+  end: "2021-01-01"
+
+solver:
+  mem_mb: 16000
+  walltime: "06:00:00"
+
+myopic_solver:
+  mem_mb: 12000
+  walltime: "14:00:00"
