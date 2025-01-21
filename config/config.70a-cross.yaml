@@ -40,15 +40,15 @@ snapshots:
 
 solver:
   mem_mb: 54000
-  threads: 32
-  runtime: 18h
+  threads: 16
+  runtime: 24h
   options: gurobi-default
 
 myopic_solver:
-  mem_mb: 16000
+  mem_mb: 20000
   runtime: 24h
 
 
 solver_options:
   gurobi-numeric:
-    threads: 32
+    threads: 16
