@@ -1,7 +1,7 @@
 run: "20250121-num-years-cross"
 
 scenario:
-  lt: 
+  lt:
   - country+DE-number_years+1-elastic_pwl+default-cross_elasticity+default
   - country+DE-number_years+2-elastic_pwl+default-cross_elasticity+default
   - country+DE-number_years+4-elastic_pwl+default-cross_elasticity+default

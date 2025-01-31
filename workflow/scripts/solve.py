@@ -90,8 +90,10 @@ def add_cross_elastic_terms(n, sns):
         if not myopic_and_cyclic:
             snapshots = snapshots[:k] if k < 0 else snapshots[k:]
         n.model.objective += (
-            p_t * d_gamma_half + p_k * d_gamma_half - p_t * p_k * 0.5 * gamma
-        ).sel(snapshot=snapshots).sum()
+            (p_t * d_gamma_half + p_k * d_gamma_half - p_t * p_k * 0.5 * gamma)
+            .sel(snapshot=snapshots)
+            .sum()
+        )
 
 
 def add_extra_functionality(n, sns):
