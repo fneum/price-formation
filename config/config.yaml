@@ -179,6 +179,7 @@ colors:
   battery dis-/charging: "#67A345"
   hydrogen: "#B8326A"
   hydrogen fuel cell: "#E17B36"
+  hydrogen turbine: "#E17B36"
   hydrogen electrolyser: "#B83C69"
   hydrogen underground storage: "#A05AA7"
   hydrogen storage: "#A05AA7"
