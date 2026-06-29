@@ -24,8 +24,6 @@ RESULTS = "results/" + (config["run"] + "/" if config["run"] else "")
 
 
 rule download_weather_data:
-    params:
-        dir="resources/reading",
     input:
         storage("https://researchdata.reading.ac.uk/321/4/ERA5_data_1950-2020.zip"),
     output:
@@ -35,6 +33,8 @@ rule download_weather_data:
         protected(
             "resources/reading/ERA5_data_1950-2020/solar_power_capacity_factor/NUTS_0_sp_historical.nc"
         ),
+    params:
+        dir="resources/reading",
     run:
         unpack_archive(input[0], params.dir)
 
@@ -72,16 +72,16 @@ rule solve:
     output:
         network=RESULTS + "network_solved_LT-{lt}.nc",
         statistics=RESULTS + "summary/LT-{lt}/statistics.csv",
+    benchmark:
+        RESULTS + "benchmarks/LT-{lt}.log"
+    retries: 3
+    conda:
+        "envs/environment.yaml"
+    threads: config["solver"]["threads"]
     resources:
         mem_mb=config["solver"]["mem_mb"],
         runtime=config["solver"]["runtime"],
         attempt=get_attempt,
-    threads: config["solver"]["threads"]
-    retries: 3
-    benchmark:
-        RESULTS + "benchmarks/LT-{lt}.log"
-    conda:
-        "envs/environment.yaml"
     script:
         "scripts/solve.py"
 
@@ -105,10 +105,10 @@ rule plot:
         cost_recovery=RESULTS + "graphics/LT-{lt}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/soc.pdf",
         metrics=RESULTS + "summary/LT-{lt}/metrics.csv",
-    resources:
-        mem_mb=8000,
     conda:
         "envs/environment.yaml"
+    resources:
+        mem_mb=8000,
     script:
         "scripts/plot.py"
 
@@ -120,15 +120,15 @@ rule solve_myopic_dispatch:
     output:
         network=RESULTS + "network_myopic_LT-{lt}_ST-{st}.nc",
         statistics=RESULTS + "summary/LT-{lt}/ST-{st}/statistics.csv",
+    benchmark:
+        RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
+    retries: 1
+    conda:
+        "envs/environment.yaml"
+    threads: config["myopic_solver"]["threads"]
     resources:
         mem_mb=config["myopic_solver"]["mem_mb"],
         runtime=config["myopic_solver"]["runtime"],
-    threads: config["myopic_solver"]["threads"]
-    retries: 1
-    benchmark:
-        RESULTS + "benchmarks/LT-{lt}_ST-{st}.log"
-    conda:
-        "envs/environment.yaml"
     script:
         "scripts/solve_myopic_dispatch.py"
 
@@ -152,10 +152,10 @@ rule plot_myopic_dispatch:
         cost_recovery=RESULTS + "graphics/LT-{lt}/ST-{st}/cost_recovery.pdf",
         soc=RESULTS + "graphics/LT-{lt}/ST-{st}/soc.pdf",
         metrics=RESULTS + "summary/LT-{lt}/ST-{st}/metrics.csv",
-    resources:
-        mem_mb=8000,
     conda:
         "envs/environment.yaml"
+    resources:
+        mem_mb=8000,
     script:
         "scripts/plot.py"
 
@@ -192,10 +192,10 @@ rule receive:
 
 
 rule all:
+    default_target: True
     input:
         expand(rules.plot_myopic_dispatch.output[-1], **config["scenario"]),
         expand(rules.plot.output[-1], **config["scenario"]),
-    default_target: True
 
 
 rule solve_myopic_dispatch_all:
